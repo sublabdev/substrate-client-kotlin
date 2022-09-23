@@ -9,12 +9,14 @@ group = "dev.sublab"
 version = "1.0.0"
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.jetbrains.kotlin:kotlin-test:1.7.10")
+    implementation("dev.sublab:scale-codec-kotlin:1.0.0")
 }
 
 tasks.test {
