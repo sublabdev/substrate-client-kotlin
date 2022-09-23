@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.7.10"
+    kotlin("plugin.serialization") version "1.7.10"
     `maven-publish`
 }
 
@@ -16,7 +17,16 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
     implementation("org.jetbrains.kotlin:kotlin-test:1.7.10")
-    implementation("dev.sublab:scale-codec-kotlin:1.0.0")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.10")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation("dev.sublab:scale-codec-kotlin:$version")
+    implementation("io.ktor:ktor-client-core:2.1.1")
+    implementation("io.ktor:ktor-client-cio:2.1.1")
+    implementation("io.ktor:ktor-client-content-negotiation:2.1.1")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.1")
+    implementation("io.ktor:ktor-client-websockets:2.1.1")
 }
 
 tasks.test {
