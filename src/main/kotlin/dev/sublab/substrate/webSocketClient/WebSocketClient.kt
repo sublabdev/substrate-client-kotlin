@@ -2,23 +2,20 @@ package dev.sublab.substrate.webSocketClient
 
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
+import io.ktor.http.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.util.*
 
 private typealias Subscriber = (String) -> Unit
-private val clientScope = CoroutineScope(Dispatchers.IO)
 
 class WebSocketClient(
-    url: String,
+    host: String,
+    path: String? = null,
     port: Int? = null
 ) {
 
-    private val receiveScope = CoroutineScope(Job())
-    private val sendScope = CoroutineScope(Job())
+    private val clientScope = CoroutineScope(Job())
 
     private val client = HttpClient {
         install(WebSockets)
@@ -29,13 +26,18 @@ class WebSocketClient(
 
     init {
         clientScope.launch {
-            client.webSocket(host = url, port = port) {
-                receiveScope.launch {
-                    receive(this@webSocket)
-                }
+            client.webSocket(host = host, path = path, port = port) {
+                try {
+                    val receive = launch {
+                        receive(this@webSocket)
+                    }
+                    val send = launch {
+                        send(this@webSocket)
+                    }
 
-                sendScope.launch {
-                    send(this@webSocket)
+                    receive.join()
+                    send.cancelAndJoin()
+                } catch (exception: Exception) {
                 }
             }
         }
@@ -59,7 +61,10 @@ class WebSocketClient(
     private suspend fun send(client: ClientWebSocketSession) {
         while (true) {
             val message = output.poll() ?: continue
-            client.send(Frame.Text(message))
+            try {
+                client.send(message)
+            } catch (e: Exception) {
+            }
         }
     }
 

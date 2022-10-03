@@ -27,6 +27,10 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:2.1.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.1")
     implementation("io.ktor:ktor-client-websockets:2.1.1")
+    testImplementation("io.ktor:ktor-server-core:2.1.1")
+    testImplementation("io.ktor:ktor-server-cio:2.1.1")
+    testImplementation("io.ktor:ktor-server-netty:2.1.1")
+    testImplementation("io.ktor:ktor-server-websockets:2.1.1")
 }
 
 tasks.test {
