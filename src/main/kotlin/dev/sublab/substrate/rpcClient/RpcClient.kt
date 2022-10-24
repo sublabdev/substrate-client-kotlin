@@ -12,6 +12,8 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
+import kotlin.reflect.typeOf
 
 internal const val rpcVersion = "2.0"
 
@@ -51,6 +53,8 @@ class RpcClient(
         block(builder)
 
         val params = builder.params?.let {
+            typeOf<P>()
+            it.first()::class.createInstance()
             val paramsSerializer = serializer(builder.paramsType)
             Json.encodeToJsonElement(ListSerializer(paramsSerializer), it)
         } ?: JsonNull
