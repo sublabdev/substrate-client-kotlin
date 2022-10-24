@@ -53,7 +53,6 @@ class RpcClient(
         block(builder)
 
         val params = builder.params?.let {
-            typeOf<P>()
             it.first()::class.createInstance()
             val paramsSerializer = serializer(builder.paramsType)
             Json.encodeToJsonElement(ListSerializer(paramsSerializer), it)
