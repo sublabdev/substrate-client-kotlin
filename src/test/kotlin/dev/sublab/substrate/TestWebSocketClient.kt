@@ -93,7 +93,7 @@ class TestWebSocketClient {
             }
         }
 
-        assertTrue(lock.await(Constants.singleTestTimeout, TimeUnit.SECONDS))
+        assertTrue(lock.await(Constants.testsTimeout, TimeUnit.SECONDS))
     }
 
     @Test
@@ -110,7 +110,7 @@ class TestWebSocketClient {
 
         // Let messages be sent and received back
         lock.await(Constants.singleTestTimeout, TimeUnit.SECONDS)
-        
+
         echoClient.subscribe {
             // Should receive all messages
             assert(testMessages.contains(it))
@@ -122,6 +122,6 @@ class TestWebSocketClient {
             assert(false)
         }
 
-        assertTrue(lock.await(Constants.singleTestTimeout, TimeUnit.SECONDS))
+        assertTrue(lock.await(Constants.testsTimeout, TimeUnit.SECONDS))
     }
 }

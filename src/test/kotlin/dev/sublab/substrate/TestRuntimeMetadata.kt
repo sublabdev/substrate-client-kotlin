@@ -5,36 +5,63 @@ import dev.sublab.scale.helpers.decodeHex
 import dev.sublab.substrate.metadata.RuntimeMetadata
 import dev.sublab.substrate.rpcClient.RpcClient
 import dev.sublab.substrate.support.Constants
+import dev.sublab.substrate.support.allNetworks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class TestRuntimeMetadata {
 
-    private val client = RpcClient(Constants.kusamaUrl)
     private val codec = ScaleCodec.default()
 
     @Test
-    fun testRuntimeMetadataParsing() = runBlocking {
-        val response = withContext(Dispatchers.IO) {
-            client.sendRequest<Unit, String> {
-                method = "state_getMetadata"
-                responseType = String::class
+    internal fun testLocalParsing() = runBlocking {
+        for (network in allNetworks()) {
+            val file = File(Constants.resourcesPath + network.localRuntimeMetadataSnapshot.path)
+            if (!file.exists()) {
+                assert(false)
+                continue
+            }
+
+            val metadataEncoded = file.readText().decodeHex()
+            try {
+                val metadataDecoded = codec.fromScale(metadataEncoded, RuntimeMetadata::class)
+
+                println("metadata from ${network.rpcUrl} magic number: ${metadataDecoded.magicNumber}, version: ${metadataDecoded.version}")
+                assertEquals(metadataDecoded.version, 14u)
+                assertEquals(metadataDecoded.magicNumber, network.localRuntimeMetadataSnapshot.magicNumber)
+            } catch (e: Exception) {
+                println("Exception: $e")
+                throw e
             }
         }
+    }
 
-        val metadataEncoded = response.decodeHex()
+    @Test
+    internal fun testRemoteParsing() = runBlocking {
+        for (network in allNetworks()) {
+            val response = withContext(Dispatchers.IO) {
+                val client = RpcClient(network.rpcUrl)
+                client.sendRequest<Unit, String> {
+                    method = "state_getMetadata"
+                    responseType = String::class
+                }
+            }
 
-        try {
-            val metadataDecoded = codec.fromScale(metadataEncoded, RuntimeMetadata::class)
+            val metadataEncoded = response.decodeHex()
 
-            println("metadata version: ${metadataDecoded.version}")
-            assertEquals(metadataDecoded.version, 14u)
-        } catch (e: Exception) {
-            println("Exception: $e")
-            throw e
+            try {
+                val metadataDecoded = codec.fromScale(metadataEncoded, RuntimeMetadata::class)
+
+                println("metadata from ${network.rpcUrl} magic number: ${metadataDecoded.magicNumber}, version: ${metadataDecoded.version}")
+                assertEquals(metadataDecoded.version, 14u)
+            } catch (e: Exception) {
+                println("Exception: $e")
+                throw e
+            }
         }
     }
 }

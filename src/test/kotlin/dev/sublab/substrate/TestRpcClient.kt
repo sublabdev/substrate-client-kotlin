@@ -3,6 +3,7 @@ package dev.sublab.substrate
 import dev.sublab.substrate.rpcClient.RpcClient
 import dev.sublab.substrate.rpcClient.RpcRequest
 import dev.sublab.substrate.support.Constants
+import dev.sublab.substrate.support.KusamaNetwork
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -14,10 +15,10 @@ import kotlin.test.assertTrue
 
 class TestRpcClient {
 
-    private val client = RpcClient(Constants.kusamaUrl)
+    private val client = RpcClient(KusamaNetwork().rpcUrl)
 
     @Test
-    fun testRpcError(): Unit = runBlocking {
+    internal fun testRpcError(): Unit = runBlocking {
         val request = RpcRequest(id = 1, method = "non_existing_method")
         val response = withContext(Dispatchers.IO) { client.send(request) }
 
@@ -25,7 +26,7 @@ class TestRpcClient {
     }
 
     @Test
-    fun testRpcRequest() = runBlocking {
+    internal fun testRpcRequest() = runBlocking {
         val requestId = (Long.MIN_VALUE..Long.MAX_VALUE).random()
         val request = RpcRequest(id = requestId, method = "state_getMetadata")
 
@@ -42,7 +43,7 @@ class TestRpcClient {
     }
 
     @Test
-    fun testSendRequest() = runBlocking {
+    internal fun testSendRequest() = runBlocking {
         val response = withContext(Dispatchers.IO) {
             client.sendRequest<Unit, String> {
                 method = "state_getMetadata"
