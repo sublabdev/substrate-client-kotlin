@@ -1,9 +1,9 @@
 package dev.sublab.substrate.modules.state
 
+import dev.sublab.hashing.decodeHex
+import dev.sublab.hashing.toHex
 import dev.sublab.hashing.utils.ByteArrayConvertible
 import dev.sublab.scale.ScaleCodec
-import dev.sublab.scale.helpers.decodeHex
-import dev.sublab.scale.helpers.toHex
 import dev.sublab.substrate.hashers.HashersProvider
 import dev.sublab.substrate.metadata.RuntimeMetadata
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage

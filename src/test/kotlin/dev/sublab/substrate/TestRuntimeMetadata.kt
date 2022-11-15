@@ -1,7 +1,7 @@
 package dev.sublab.substrate
 
+import dev.sublab.hashing.decodeHex
 import dev.sublab.scale.ScaleCodec
-import dev.sublab.scale.helpers.decodeHex
 import dev.sublab.substrate.metadata.RuntimeMetadata
 import dev.sublab.substrate.rpcClient.RpcClient
 import dev.sublab.substrate.support.Constants
