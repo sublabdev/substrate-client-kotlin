@@ -1,6 +1,5 @@
 package dev.sublab.substrate
 
-import dev.sublab.substrate.metadata.RuntimeMetadata
 import dev.sublab.substrate.support.KusamaNetwork
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
@@ -9,7 +8,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-data class RpcConstant<T: Any>(
+private data class RpcConstant<T: Any>(
     val module: String,
     val constant: String,
     val type: KClass<T>,
@@ -33,32 +32,18 @@ class TestFetchingConstants {
         RpcConstant("timestamp", "minimumPeriod", ULong::class, 3000UL),
     )
 
-    private fun constantsService(runtimeMetadata: Flow<RuntimeMetadata>)
-        = SubstrateConstantsService(client.codec, runtimeMetadata, SubstrateClientNamingPolicy.CASE_INSENSITIVE)
-
     @Test
-    fun testServiceWithDirectInjection() = runBlocking {
-        val runtimeMetadata = MutableStateFlow(client.loadRuntime())
-        val service = constantsService(runtimeMetadata)
+    internal fun testService() = runBlocking {
+        val service = SubstrateConstantsService(client.codec, client.lookupService)
         for (constant in constants) {
             testConstant(service, constant)
         }
     }
 
     @Test
-    fun testServiceWithProvidedFlow() = runBlocking {
-        val runtimeMetadata = client.getRuntime()
-        val service = constantsService(runtimeMetadata)
+    internal fun testClient() = runBlocking {
         for (constant in constants) {
-            testConstant(service, constant)
-        }
-    }
-
-    @Test
-    fun testClient() = runBlocking {
-        val service = client.getConstantsService()
-        for (constant in constants) {
-            testConstant(service, constant)
+            testConstant(client.constantsService, constant)
         }
     }
 

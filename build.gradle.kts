@@ -22,6 +22,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
     implementation("dev.sublab:scale-codec-kotlin:$version")
+    implementation("dev.sublab:hashing-kotlin:$version")
     implementation("io.ktor:ktor-client-core:2.1.3")
     implementation("io.ktor:ktor-client-cio:2.1.3")
     implementation("io.ktor:ktor-client-content-negotiation:2.1.3")
