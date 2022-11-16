@@ -17,5 +17,5 @@ class SubstrateConstantsService(
         }
 
     fun <T: Any> fetch(constant: RuntimeModuleConstant, type: KClass<T>)
-        = codec.fromScale(constant.value.toByteArray(), type)
+        = codec.fromScale(constant.value, type)
 }

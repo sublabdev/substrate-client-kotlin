@@ -3,6 +3,7 @@ package dev.sublab.substrate
 import dev.sublab.hashing.decodeHex
 import dev.sublab.hashing.utils.ByteArrayConvertible
 import dev.sublab.hashing.utils.asByteArrayConvertible
+import dev.sublab.scale.dataTypes.UInt64
 import dev.sublab.substrate.modules.system.storage.Account
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.KusamaNetwork
@@ -30,7 +31,7 @@ class TestFetchingStorage {
     private val client = SubstrateClient(url = network.rpcUrl)
 
     private val items: List<RpcStorageItem<*>> = listOf(
-        RpcStorageItem("timestamp", "now", ULong::class) {
+        RpcStorageItem("timestamp", "now", UInt64::class) {
             // Difference should be within one minute, let's assume some big lag
             Duration.between(Instant.now(), Instant.ofEpochMilli(it.toLong())).seconds < Constants.testsTimeout
         },

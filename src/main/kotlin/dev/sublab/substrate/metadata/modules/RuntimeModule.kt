@@ -1,5 +1,6 @@
 package dev.sublab.substrate.metadata.modules
 
+import dev.sublab.scale.dataTypes.*
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage
 import java.math.BigInteger
 
@@ -10,8 +11,8 @@ data class RuntimeModule(
     private val eventsIndex: BigInteger?,
     val constants: List<RuntimeModuleConstant>,
     private val errorsIndex: BigInteger?,
-    private val indexUByte: UByte
+    private val indexUInt8: UInt8
 ) {
 
-    val index get() = indexUByte.toUInt()
+    val index: UInt32 get() = indexUInt8.toUInt()
 }

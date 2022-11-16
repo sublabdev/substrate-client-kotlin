@@ -1,5 +1,6 @@
 package dev.sublab.substrate
 
+import dev.sublab.scale.dataTypes.*
 import dev.sublab.substrate.support.KusamaNetwork
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
@@ -20,16 +21,16 @@ class TestFetchingConstants {
     private val client = SubstrateClient(url = network.rpcUrl)
 
     private val constants: List<RpcConstant<*>> = listOf(
-        RpcConstant("babe", "epochDuration", ULong::class, 600UL),
-        RpcConstant("babe", "expectedBlockTime", ULong::class, 6000UL),
-        RpcConstant("balances", "existentialDeposit", ULong::class, 33333333UL),
-        RpcConstant("crowdloan", "minContribution", ULong::class, 99999999000UL),
-        RpcConstant("staking", "bondingDuration", UInt::class, 28U),
-        RpcConstant("staking", "maxNominations", UInt::class, 24U),
-        RpcConstant("staking", "sessionsPerEra", UInt::class, 6U),
-        RpcConstant("system", "blockHashCount", UInt::class, 4096U),
-        RpcConstant("system", "ss58Prefix", UShort::class, 2U),
-        RpcConstant("timestamp", "minimumPeriod", ULong::class, 3000UL),
+        RpcConstant("babe", "epochDuration", UInt64::class, 600UL),
+        RpcConstant("babe", "expectedBlockTime", UInt64::class, 6000UL),
+        RpcConstant("balances", "existentialDeposit", UInt64::class, 33333333UL),
+        RpcConstant("crowdloan", "minContribution", UInt64::class, 99999999000UL),
+        RpcConstant("staking", "bondingDuration", UInt32::class, 28U),
+        RpcConstant("staking", "maxNominations", UInt32::class, 24U),
+        RpcConstant("staking", "sessionsPerEra", UInt32::class, 6U),
+        RpcConstant("system", "blockHashCount", UInt32::class, 4096U),
+        RpcConstant("system", "ss58Prefix", UInt16::class, 2U),
+        RpcConstant("timestamp", "minimumPeriod", UInt64::class, 3000UL),
     )
 
     @Test
