@@ -52,8 +52,7 @@ class TestFetchingConstants {
             assertEquals(constant.expectedValue, it)
         }
 
-        val runtimeConstant = service.find(constant.module, constant.constant)
-        runtimeConstant.take(1).collect {
+        service.find(constant.module, constant.constant).take(1).collect {
             assertNotNull(it)
             val value = service.fetch(it, constant.type)
             assertEquals(constant.expectedValue, value)

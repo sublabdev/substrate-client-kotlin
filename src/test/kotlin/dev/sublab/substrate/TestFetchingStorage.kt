@@ -6,6 +6,7 @@ import dev.sublab.hashing.utils.asByteArrayConvertible
 import dev.sublab.substrate.modules.system.storage.Account
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.KusamaNetwork
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import java.math.BigInteger
@@ -64,6 +65,14 @@ class TestFetchingStorage {
             assertNotNull(it)
             item.validation?.let { isValid ->
                 assertTrue(isValid(it))
+            }
+        }
+
+        service.find(item.module, item.item).take(1).collect {
+            assertNotNull(it)
+            val value = service.fetch(it.item, item.keys, it.storage, item.type)
+            item.validation?.let { isValid ->
+                assertTrue(isValid(value))
             }
         }
     }
