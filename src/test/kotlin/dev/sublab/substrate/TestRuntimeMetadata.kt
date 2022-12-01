@@ -9,7 +9,8 @@ import dev.sublab.substrate.support.allNetworks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import java.io.File
+import okio.FileSystem
+import okio.Path.Companion.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -19,14 +20,15 @@ class TestRuntimeMetadata {
 
     @Test
     internal fun testLocalParsing() = runBlocking {
+        val fs = FileSystem.SYSTEM
         for (network in allNetworks()) {
-            val file = File(Constants.resourcesPath + network.localRuntimeMetadataSnapshot.path)
-            if (!file.exists()) {
+            val path = (Constants.resourcesPath + network.localRuntimeMetadataSnapshot.path).toPath()
+            if (!fs.exists(path)) {
                 assert(false)
                 continue
             }
 
-            val metadataEncoded = file.readText().hex.decode()
+            val metadataEncoded = fs.read(path) { readUtf8() }.hex.decode()
             try {
                 val metadataDecoded = codec.fromScale(metadataEncoded, RuntimeMetadata::class)
 

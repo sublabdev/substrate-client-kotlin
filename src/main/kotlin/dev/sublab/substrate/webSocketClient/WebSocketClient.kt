@@ -1,10 +1,11 @@
 package dev.sublab.substrate.webSocketClient
 
+import extra.kotlin.collection.ArrayListQueue
+import extra.kotlin.collection.Queue
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
-import java.util.*
 
 private typealias Subscriber = (String) -> Unit
 private typealias ErrorSubscriber = (Throwable) -> Unit
@@ -31,8 +32,8 @@ class WebSocketClient(
     private val subscribers = mutableListOf<Subscriber>()
     private val errorSubscribers = mutableListOf<ErrorSubscriber>()
 
-    private val input: Queue<String> = LinkedList()
-    private val output: Queue<String> = LinkedList()
+    private val input: Queue<String> = ArrayListQueue()
+    private val output: Queue<String> = ArrayListQueue()
 
     init {
         clientScope.launch {

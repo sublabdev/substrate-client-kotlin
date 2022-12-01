@@ -3,8 +3,8 @@ package dev.sublab.substrate.utils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import java.time.Duration
-import java.time.Instant
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 class JobWithTimeout(
     private val scope: CoroutineScope = CoroutineScope(Job()),
@@ -15,9 +15,9 @@ class JobWithTimeout(
     private var lastPerform: Instant? = null
 
     fun perform() {
-        val current = Instant.now()
+        val current = Clock.System.now()
         val canPerform = lastPerform?.let {
-            Duration.between(current, it).toMillis() > timeoutMs
+            (current - it).inWholeMilliseconds > timeoutMs
         } ?: true
 
         if (canPerform) {

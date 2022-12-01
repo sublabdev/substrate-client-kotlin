@@ -9,9 +9,9 @@ import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.KusamaNetwork
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import java.math.BigInteger
-import java.time.Duration
-import java.time.Instant
 import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertNotNull
@@ -32,7 +32,7 @@ class TestFetchingStorage {
     private val items: List<RpcStorageItem<*>> = listOf(
         RpcStorageItem("timestamp", "now", UInt64::class) {
             // Difference should be within one minute, let's assume some big lag
-            Duration.between(Instant.now(), Instant.ofEpochMilli(it.toLong())).seconds < Constants.testsTimeout
+            (Clock.System.now() - Instant.fromEpochMilliseconds(it.toLong())).inWholeSeconds < Constants.testsTimeout
         },
         RpcStorageItem("system", "account", Account::class, keys = listOf(
             "0xd857fcac7bd9bb03551d70b9743895a98b74b06e54bdc34f1b27ab240356857d".hex.decode().asByteArrayConvertible()

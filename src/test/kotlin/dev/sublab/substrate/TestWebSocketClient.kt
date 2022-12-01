@@ -3,7 +3,7 @@ package dev.sublab.substrate
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.webSocketClient.WebSocketClient
 import dev.sublab.substrate.webSocketClient.WebSocketClientSubscriptionPolicy
-import java.util.UUID
+import extra.kotlin.util.UUID
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.test.Test
@@ -18,7 +18,7 @@ class TestWebSocketClient {
     @Test
     internal fun testOne() {
         val lock = CountDownLatch(1)
-        val testMessage = UUID.randomUUID().toString()
+        val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient()
         echoClient.subscribe {
@@ -33,7 +33,7 @@ class TestWebSocketClient {
     @Test
     internal fun testNone() {
         val lock = CountDownLatch(1)
-        val testMessage = UUID.randomUUID().toString()
+        val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient()
         echoClient.send(testMessage)
@@ -54,7 +54,7 @@ class TestWebSocketClient {
     @Test
     internal fun testFirst() {
         val lock = CountDownLatch(Constants.testsCount)
-        val testMessage = UUID.randomUUID().toString()
+        val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient(policy = WebSocketClientSubscriptionPolicy.FIRST_SUBSCRIBER)
         echoClient.send(testMessage)
@@ -77,7 +77,7 @@ class TestWebSocketClient {
     @Test
     internal fun testAll() {
         val lock = CountDownLatch(Constants.testsCount)
-        val testMessage = UUID.randomUUID().toString()
+        val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient(policy = WebSocketClientSubscriptionPolicy.ALL_SUBSCRIBERS)
         echoClient.send(testMessage)
@@ -103,7 +103,7 @@ class TestWebSocketClient {
 
         val testMessages = HashSet<String>()
         for (i in 0 until Constants.testsCount) {
-            val testMessage = UUID.randomUUID().toString()
+            val testMessage = UUID.uuid4().toString()
             echoClient.send(testMessage)
             testMessages.add(testMessage)
         }

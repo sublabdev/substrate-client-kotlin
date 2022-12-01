@@ -29,6 +29,10 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:2.1.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.1.3")
     implementation("io.ktor:ktor-client-websockets:2.1.3")
+    implementation("org.kotlinextra:kotlin-extlib-jvm:0.1.10") // TODO: resolve to all platforms
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation("com.squareup.okio:okio:3.2.0")
+
 }
 
 tasks.test {
