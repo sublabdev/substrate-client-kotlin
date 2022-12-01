@@ -26,16 +26,20 @@ class SubstrateLookupService(
     private var constantsCache: MutableMap<ModulePath, RuntimeModuleConstant> = mutableMapOf()
     private var storageItemsCache: MutableMap<ModulePath, RuntimeModuleStorageItem> = mutableMapOf()
 
-    fun findModule(name: String) = runtimeMetadata.map { metadata ->
+    private fun findModule(metadata: RuntimeMetadata, name: String): RuntimeModule? {
         val module = modulesCache[name]
             ?: metadata.modules.firstOrNull { equals(it.name, name) }
-            ?: return@map null
+            ?: return null
 
         modulesCache[name] = module
-        module
+        return module
     }
 
-    fun findConstant(module: RuntimeModule, name: String): RuntimeModuleConstant? {
+    fun findModule(name: String) = runtimeMetadata.map { metadata ->
+        findModule(metadata, name)
+    }
+
+    private fun findConstant(module: RuntimeModule, name: String): RuntimeModuleConstant? {
         val constantPath = ModulePath(module.name, name)
         val constant = constantsCache[constantPath]
             ?: module.constants.firstOrNull { equals(it.name, name) }
@@ -53,7 +57,7 @@ class SubstrateLookupService(
 
     data class FindStorageItemResult(val item: RuntimeModuleStorageItem, val storage: RuntimeModuleStorage)
 
-    fun findStorageItem(module: RuntimeModule, name: String): FindStorageItemResult? {
+    private fun findStorageItem(module: RuntimeModule, name: String): FindStorageItemResult? {
         val storage = module.storage ?: return null
 
         val constantPath = ModulePath(module.name, name)
