@@ -1,13 +1,12 @@
 package dev.sublab.substrate
 
-import dev.sublab.hashing.decodeHex
-import dev.sublab.hashing.utils.ByteArrayConvertible
-import dev.sublab.hashing.utils.asByteArrayConvertible
-import dev.sublab.scale.dataTypes.UInt64
+import dev.sublab.common.ByteArrayConvertible
+import dev.sublab.common.asByteArrayConvertible
+import dev.sublab.common.numerics.UInt64
+import dev.sublab.hex.hex
 import dev.sublab.substrate.modules.system.storage.Account
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.KusamaNetwork
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import java.math.BigInteger
@@ -36,7 +35,7 @@ class TestFetchingStorage {
             Duration.between(Instant.now(), Instant.ofEpochMilli(it.toLong())).seconds < Constants.testsTimeout
         },
         RpcStorageItem("system", "account", Account::class, keys = listOf(
-            "0xd857fcac7bd9bb03551d70b9743895a98b74b06e54bdc34f1b27ab240356857d".decodeHex().asByteArrayConvertible()
+            "0xd857fcac7bd9bb03551d70b9743895a98b74b06e54bdc34f1b27ab240356857d".hex.decode().asByteArrayConvertible()
         )) { account ->
             // Random Kusama validator account, as long as it participates in validation, all field should be > 0
             account.data.feeFrozen.value > BigInteger.ZERO &&

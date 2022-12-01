@@ -1,7 +1,8 @@
 package dev.sublab.substrate.hashers
 
+import dev.sublab.common.ByteArrayConvertible
 import dev.sublab.hashing.*
-import dev.sublab.hashing.utils.ByteArrayConvertible
+import dev.sublab.hashing.hashers.*
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorageHasher
 import dev.sublab.substrate.metadata.modules.storage.item.RuntimeModuleStorageItem

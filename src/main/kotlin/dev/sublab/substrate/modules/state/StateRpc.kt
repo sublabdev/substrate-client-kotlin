@@ -1,8 +1,7 @@
 package dev.sublab.substrate.modules.state
 
-import dev.sublab.hashing.decodeHex
-import dev.sublab.hashing.toHex
-import dev.sublab.hashing.utils.ByteArrayConvertible
+import dev.sublab.common.ByteArrayConvertible
+import dev.sublab.hex.hex
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.hashers.HashersProvider
 import dev.sublab.substrate.metadata.RuntimeMetadata
@@ -44,7 +43,7 @@ class StateRpcClient(
         method = "state_getMetadata"
         responseType = String::class
     }.let {
-        codec.fromScale(it.decodeHex(), RuntimeMetadata::class)
+        codec.fromScale(it.hex.decode(), RuntimeMetadata::class)
     }
 
     private suspend fun <T: Any> fetchStorageItem(
@@ -54,9 +53,9 @@ class StateRpcClient(
         method = "state_getStorage"
         responseType = String::class
         paramsType = String::class
-        params = listOf(key.toHex(true))
+        params = listOf(key.hex.encode(true))
     }.let {
-        codec.fromScale(it.decodeHex(), type)
+        codec.fromScale(it.hex.decode(), type)
     }
 
     override suspend fun <T : Any> fetchStorageItem(

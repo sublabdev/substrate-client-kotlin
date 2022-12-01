@@ -21,6 +21,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation("dev.sublab:common-kotlin:$version")
     implementation("dev.sublab:scale-codec-kotlin:$version")
     implementation("dev.sublab:hashing-kotlin:$version")
     implementation("io.ktor:ktor-client-core:2.1.3")

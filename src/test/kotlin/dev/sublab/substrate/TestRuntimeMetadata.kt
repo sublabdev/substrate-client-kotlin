@@ -1,6 +1,6 @@
 package dev.sublab.substrate
 
-import dev.sublab.hashing.decodeHex
+import dev.sublab.hex.hex
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.metadata.RuntimeMetadata
 import dev.sublab.substrate.rpcClient.RpcClient
@@ -26,7 +26,7 @@ class TestRuntimeMetadata {
                 continue
             }
 
-            val metadataEncoded = file.readText().decodeHex()
+            val metadataEncoded = file.readText().hex.decode()
             try {
                 val metadataDecoded = codec.fromScale(metadataEncoded, RuntimeMetadata::class)
 
@@ -51,7 +51,7 @@ class TestRuntimeMetadata {
                 }
             }
 
-            val metadataEncoded = response.decodeHex()
+            val metadataEncoded = response.hex.decode()
 
             try {
                 val metadataDecoded = codec.fromScale(metadataEncoded, RuntimeMetadata::class)

@@ -1,6 +1,6 @@
 package dev.sublab.substrate.modules.system.storage
 
-import dev.sublab.scale.dataTypes.UInt128
+import dev.sublab.common.numerics.UInt128
 
 data class Account(
     val nonce: UInt,

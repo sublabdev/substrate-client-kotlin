@@ -1,6 +1,6 @@
 package dev.sublab.substrate.metadata.lookup.type.def
 
-import dev.sublab.scale.dataTypes.UInt8
+import dev.sublab.common.numerics.UInt8
 
 data class RuntimeTypeDefVariant(
     val variants: List<Variant>

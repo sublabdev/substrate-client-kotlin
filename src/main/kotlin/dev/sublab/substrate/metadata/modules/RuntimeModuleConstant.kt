@@ -1,6 +1,6 @@
 package dev.sublab.substrate.metadata.modules
 
-import dev.sublab.scale.dataTypes.Int8
+import dev.sublab.common.numerics.Int8
 import java.math.BigInteger
 
 data class RuntimeModuleConstant(

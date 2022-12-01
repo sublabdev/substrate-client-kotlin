@@ -1,6 +1,6 @@
 package dev.sublab.substrate
 
-import dev.sublab.hashing.utils.ByteArrayConvertible
+import dev.sublab.common.ByteArrayConvertible
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage
 import dev.sublab.substrate.metadata.modules.storage.item.RuntimeModuleStorageItem

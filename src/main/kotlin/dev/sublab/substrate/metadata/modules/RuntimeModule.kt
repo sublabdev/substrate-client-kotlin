@@ -1,6 +1,6 @@
 package dev.sublab.substrate.metadata.modules
 
-import dev.sublab.scale.dataTypes.*
+import dev.sublab.common.numerics.*
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage
 import java.math.BigInteger
 

@@ -1,6 +1,6 @@
 package dev.sublab.substrate.metadata.lookup.type.def
 
-import dev.sublab.scale.dataTypes.UInt32
+import dev.sublab.common.numerics.UInt32
 import java.math.BigInteger
 
 data class RuntimeTypeDefArray(

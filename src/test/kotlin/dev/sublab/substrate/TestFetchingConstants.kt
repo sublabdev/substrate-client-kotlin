@@ -1,6 +1,6 @@
 package dev.sublab.substrate
 
-import dev.sublab.scale.dataTypes.*
+import dev.sublab.common.numerics.*
 import dev.sublab.substrate.support.KusamaNetwork
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking

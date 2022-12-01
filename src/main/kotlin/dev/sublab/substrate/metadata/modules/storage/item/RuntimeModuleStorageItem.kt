@@ -1,6 +1,6 @@
 package dev.sublab.substrate.metadata.modules.storage.item
 
-import dev.sublab.scale.dataTypes.Int8
+import dev.sublab.common.numerics.Int8
 import dev.sublab.substrate.metadata.modules.storage.item.type.RuntimeModuleStorageItemType
 
 data class RuntimeModuleStorageItem(

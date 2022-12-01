@@ -1,6 +1,6 @@
 package dev.sublab.substrate.metadata
 
-import dev.sublab.scale.dataTypes.*
+import dev.sublab.common.numerics.*
 import dev.sublab.substrate.metadata.lookup.RuntimeLookup
 import dev.sublab.substrate.metadata.modules.RuntimeModule
 
