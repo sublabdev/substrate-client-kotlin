@@ -1,9 +1,12 @@
 package dev.sublab.substrate.support
 
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+
 object Constants {
     const val testsCount = 1000
-    const val singleTestTimeout = 5L
-    const val testsTimeout = 60L
+    val singleTestTimeout = 3.seconds
+    val testsTimeout = 1.minutes
 
     const val webSocketUrl = "echo.ws.sublab.dev"
     const val webSocketPort = 8023

@@ -4,101 +4,110 @@ import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.webSocketClient.WebSocketClient
 import dev.sublab.substrate.webSocketClient.WebSocketClientSubscriptionPolicy
 import extra.kotlin.util.UUID
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.assertNull
 
 class TestWebSocketClient {
-
     private fun echoClient(policy: WebSocketClientSubscriptionPolicy = WebSocketClientSubscriptionPolicy.NONE)
         = WebSocketClient(host = Constants.webSocketUrl, port = Constants.webSocketPort, policy = policy)
 
     @Test
-    internal fun testOne() {
-        val lock = CountDownLatch(1)
+    internal fun testOne() = runBlocking {
         val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient()
-        echoClient.subscribe {
-            assertEquals(testMessage, it)
-            lock.countDown()
-        }
+
         echoClient.send(testMessage)
 
-        assertTrue(lock.await(Constants.singleTestTimeout, TimeUnit.SECONDS))
+        val response = withTimeout(Constants.singleTestTimeout) {
+            echoClient.subscribe().first()
+        }
+
+        assertEquals(testMessage, response)
     }
 
     @Test
-    internal fun testNone() {
-        val lock = CountDownLatch(1)
+    internal fun testNone() = runBlocking {
         val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient()
+
         echoClient.send(testMessage)
 
-        // Let message be sent and received back
-        lock.await(Constants.singleTestTimeout, TimeUnit.SECONDS)
+        // Let message be echoed before we subscribe
+        delay(Constants.singleTestTimeout)
 
-        echoClient.subscribe {
-            // Shouldn't receive any messages
-            assertEquals(testMessage, it)
-            assert(false)
-            lock.countDown()
+        val response = withTimeoutOrNull(Constants.singleTestTimeout) {
+            echoClient.subscribe().first()
         }
 
-        lock.await(Constants.singleTestTimeout, TimeUnit.SECONDS)
+        assertNull(response)
     }
 
     @Test
-    internal fun testFirst() {
-        val lock = CountDownLatch(Constants.testsCount)
+    internal fun testFirst(): Unit = runBlocking {
         val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient(policy = WebSocketClientSubscriptionPolicy.FIRST_SUBSCRIBER)
         echoClient.send(testMessage)
 
-        // Let message be sent and received back
-        lock.await(Constants.singleTestTimeout, TimeUnit.SECONDS)
+        // Let message be echoed before we subscribe
+        delay(Constants.singleTestTimeout)
 
-        for (i in 0 until Constants.testsCount) {
-            echoClient.subscribe {
-                // Should receive message only on first subscription
+        val firstResponse = withTimeout(Constants.singleTestTimeout) {
+            echoClient.subscribe().first()
+        }
+
+        assertEquals(testMessage, firstResponse)
+
+        val unexpectedResponses = withTimeoutOrNull(Constants.singleTestTimeout) {
+            val subscriptions = (1 until Constants.testsCount).map {
+                echoClient.subscribe()
+            }
+
+            combine(subscriptions) { it }.first()
+        }
+
+        unexpectedResponses?.let { responses ->
+            // this is unexpected behavior, but still let's do some asserts
+            assertEquals(responses.size,  Constants.testsCount - 1)
+            responses.forEach {
                 assertEquals(testMessage, it)
-                assertEquals(i, 0)
-                lock.countDown()
             }
         }
 
-        lock.await(Constants.singleTestTimeout, TimeUnit.SECONDS)
+        assertNull(unexpectedResponses)
     }
 
     @Test
-    internal fun testAll() {
-        val lock = CountDownLatch(Constants.testsCount)
+    internal fun testAll() = runBlocking {
         val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient(policy = WebSocketClientSubscriptionPolicy.ALL_SUBSCRIBERS)
         echoClient.send(testMessage)
 
-        // Let message be sent and received back
-        lock.await(Constants.singleTestTimeout, TimeUnit.SECONDS)
+        // Let message be echoed before we subscribe
+        delay(Constants.singleTestTimeout)
 
-        for (i in 0 until Constants.testsCount) {
-            echoClient.subscribe {
-                // Should receive message every subscription
-                assertEquals(testMessage, it)
-                lock.countDown()
+        val responses = withTimeout(Constants.singleTestTimeout) {
+            val subscriptions = (0 until Constants.testsCount).map {
+                echoClient.subscribe()
             }
+
+            combine(subscriptions) { it }.first()
         }
 
-        assertTrue(lock.await(Constants.testsTimeout, TimeUnit.SECONDS))
+        assertEquals(Constants.testsCount, responses.size)
+        responses.forEach {
+            assertEquals(testMessage, it)
+        }
     }
 
     @Test
-    internal fun test() {
-        val lock = CountDownLatch(Constants.testsCount)
+    internal fun `verify first subscriber gets message, rest don't`() = runBlocking{
         val echoClient = echoClient(policy = WebSocketClientSubscriptionPolicy.FIRST_SUBSCRIBER)
 
         val testMessages = HashSet<String>()
@@ -108,20 +117,27 @@ class TestWebSocketClient {
             testMessages.add(testMessage)
         }
 
-        // Let messages be sent and received back
-        lock.await(Constants.singleTestTimeout, TimeUnit.SECONDS)
+        // Let message be echoed before we subscribe
+        delay(Constants.singleTestTimeout)
 
-        echoClient.subscribe {
-            // Should receive all messages
-            assert(testMessages.contains(it))
-            lock.countDown()
+        // Enter with timeout, so if we don't take all "1000" messages, timeout is thrown
+        withTimeout(Constants.singleTestTimeout) {
+            // Take first "1000" messages to unblock that scope and leave timeout with success
+            echoClient.subscribe().take(testMessages.size).collect {
+                // Should receive all messages
+                assert(testMessages.contains(it))
+                testMessages.remove(it)
+            }
         }
 
-        echoClient.subscribe {
-            // Shouldn't receive anything
-            assert(false)
+        // Double check if all messages were received
+        assertEquals(true, testMessages.isEmpty())
+
+        val unexpectedResponse = withTimeoutOrNull(Constants.singleTestTimeout) {
+            echoClient.subscribe().first()
         }
 
-        assertTrue(lock.await(Constants.testsTimeout, TimeUnit.SECONDS))
+        // Shouldn't receive anything
+        assertNull(unexpectedResponse)
     }
 }

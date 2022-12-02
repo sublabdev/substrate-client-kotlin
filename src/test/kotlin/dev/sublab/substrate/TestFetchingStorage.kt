@@ -32,7 +32,7 @@ class TestFetchingStorage {
     private val items: List<RpcStorageItem<*>> = listOf(
         RpcStorageItem("timestamp", "now", UInt64::class) {
             // Difference should be within one minute, let's assume some big lag
-            (Clock.System.now() - Instant.fromEpochMilliseconds(it.toLong())).inWholeSeconds < Constants.testsTimeout
+            (Clock.System.now() - Instant.fromEpochMilliseconds(it.toLong())).inWholeSeconds < Constants.testsTimeout.inWholeSeconds
         },
         RpcStorageItem("system", "account", Account::class, keys = listOf(
             "0xd857fcac7bd9bb03551d70b9743895a98b74b06e54bdc34f1b27ab240356857d".hex.decode().asByteArrayConvertible()

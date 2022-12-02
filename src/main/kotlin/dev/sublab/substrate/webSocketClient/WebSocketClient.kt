@@ -1,14 +1,15 @@
 package dev.sublab.substrate.webSocketClient
 
-import extra.kotlin.collection.ArrayListQueue
-import extra.kotlin.collection.Queue
 import io.ktor.client.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.*
-
-private typealias Subscriber = (String) -> Unit
-private typealias ErrorSubscriber = (Throwable) -> Unit
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 
 enum class WebSocketClientSubscriptionPolicy {
     NONE,
@@ -16,6 +17,7 @@ enum class WebSocketClientSubscriptionPolicy {
     ALL_SUBSCRIBERS
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class WebSocketClient(
     host: String,
     path: String? = null,
@@ -29,11 +31,9 @@ class WebSocketClient(
         install(WebSockets)
     }
 
-    private val subscribers = mutableListOf<Subscriber>()
-    private val errorSubscribers = mutableListOf<ErrorSubscriber>()
-
-    private val input: Queue<String> = ArrayListQueue()
-    private val output: Queue<String> = ArrayListQueue()
+    private val input = MutableSharedFlow<String>(replay = Int.MAX_VALUE, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val error = Channel<Throwable>()
+    private val output = Channel<String>()
 
     init {
         clientScope.launch {
@@ -45,11 +45,13 @@ class WebSocketClient(
                     receive.join()
                     send.cancelAndJoin()
                 } catch (e: Exception) {
-                    errorSubscribers.forEach { it(e) }
+                    error.send(e)
                 }
             }
         }
     }
+
+    private var hadSubscriptions = false
 
     private suspend fun receive(client: ClientWebSocketSession) {
         try {
@@ -57,67 +59,50 @@ class WebSocketClient(
                 message as? Frame.Text ?: continue
                 val text = message.readText()
 
-                if (subscribers.isEmpty()) {
-                    if (policy != WebSocketClientSubscriptionPolicy.NONE) {
-                        input.add(text)
-                    }
-                } else {
-                    for (subscriber in subscribers) {
-                        subscriber(text)
-                    }
+                var resetReplayCache = policy == WebSocketClientSubscriptionPolicy.NONE
+                if (!resetReplayCache) {
+                    resetReplayCache = policy == WebSocketClientSubscriptionPolicy.FIRST_SUBSCRIBER && hadSubscriptions
+                }
+
+                input.emit(text)
+                if (resetReplayCache) {
+                    input.resetReplayCache()
                 }
             }
         } catch (e: Exception) {
-            println(e)
+            error.send(e)
         }
     }
 
-    private suspend fun send(client: ClientWebSocketSession) {
-        while (true) {
-            val message = output.poll() ?: continue
-            try {
-                client.send(message)
-            } catch (e: Exception) {
-                errorSubscribers.forEach { it(e) }
-            }
+    private suspend fun send(client: ClientWebSocketSession) = output.consumeEach { message ->
+        try {
+            client.send(message)
+        } catch (e: Exception) {
+            error.send(e)
         }
     }
 
-    fun send(message: String) {
-        output.add(message)
-    }
+    suspend fun send(message: String) = output.send(message)
 
-    fun subscribe(onError: ErrorSubscriber? = null, onReceive: Subscriber? = null) {
-        addSubscriber(onReceive)
-        addErrorSubscriber(onError)
-    }
-
-    private fun addSubscriber(subscriber: Subscriber?) {
-        val subscriber = subscriber ?: return
-        if (input.isNotEmpty()) {
-            fun sendMessages() {
-                for (message in input) {
-                    subscriber(message)
+    fun subscribe(): Flow<String> = input.apply {
+        when (policy) {
+            WebSocketClientSubscriptionPolicy.FIRST_SUBSCRIBER -> {
+                if (!hadSubscriptions) {
+                    // If it's first subscription, just toggle this
+                    // So when message is received, cache is reset
+                    hadSubscriptions = true
+                } else {
+                    // If there was a subscriber already, simply reset before returning
+                    // So no one else receives it
+                    input.resetReplayCache()
                 }
             }
-
-            when (policy) {
-                WebSocketClientSubscriptionPolicy.ALL_SUBSCRIBERS -> sendMessages()
-                WebSocketClientSubscriptionPolicy.FIRST_SUBSCRIBER -> {
-                    if (subscribers.isEmpty()) {
-                        sendMessages()
-                        input.clear()
-                    }
-                }
-                else -> {}
-            }
+            // Always reset to prevent getting messages
+            WebSocketClientSubscriptionPolicy.NONE -> input.resetReplayCache()
+            // In that case never reset cache
+            WebSocketClientSubscriptionPolicy.ALL_SUBSCRIBERS -> {}
         }
-
-        subscribers.add(subscriber)
     }
 
-    private fun addErrorSubscriber(errorSubscriber: ErrorSubscriber?) {
-        val subscriber = errorSubscriber ?: return
-        errorSubscribers.add(subscriber)
-    }
+    fun subscribeToErrors() = error.receiveAsFlow()
 }
