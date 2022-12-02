@@ -44,6 +44,11 @@ class TestWebSocketClient {
             echoClient.subscribe().first()
         }
 
+        response?.let {
+            // this is unexpected behavior, but still let's do some asserts
+            assertEquals(testMessage, it)
+        }
+
         assertNull(response)
     }
 
@@ -64,7 +69,7 @@ class TestWebSocketClient {
         assertEquals(testMessage, firstResponse)
 
         val unexpectedResponses = withTimeoutOrNull(Constants.singleTestTimeout) {
-            val subscriptions = (1 until Constants.testsCount).map {
+            val subscriptions = (0 until Constants.testsCount).map {
                 echoClient.subscribe()
             }
 
@@ -73,7 +78,6 @@ class TestWebSocketClient {
 
         unexpectedResponses?.let { responses ->
             // this is unexpected behavior, but still let's do some asserts
-            assertEquals(responses.size,  Constants.testsCount - 1)
             responses.forEach {
                 assertEquals(testMessage, it)
             }
