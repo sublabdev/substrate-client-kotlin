@@ -16,7 +16,7 @@ private data class RpcConstant<T: Any>(
     val expectedValue: T
 )
 
-class TestFetchingConstants {
+internal class TestFetchingConstants {
     private val network = KusamaNetwork()
     private val client = SubstrateClient(url = network.rpcUrl)
 
@@ -34,7 +34,7 @@ class TestFetchingConstants {
     )
 
     @Test
-    internal fun testService() = runBlocking {
+    fun testService() = runBlocking {
         val service = SubstrateConstantsService(client.codec, client.lookupService)
         for (constant in constants) {
             testConstant(service, constant)
@@ -42,7 +42,7 @@ class TestFetchingConstants {
     }
 
     @Test
-    internal fun testClient() = runBlocking {
+    fun testClient() = runBlocking {
         for (constant in constants) {
             testConstant(client.constantsService, constant)
         }

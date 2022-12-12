@@ -1,12 +1,13 @@
 package dev.sublab.substrate.modules.system.storage
 
 import dev.sublab.common.numerics.UInt128
+import dev.sublab.common.numerics.UInt32
 
 data class Account(
-    val nonce: UInt,
-    val consumers: UInt,
-    val providers: UInt,
-    val sufficients: UInt,
+    val nonce: UInt32,
+    val consumers: UInt32,
+    val providers: UInt32,
+    val sufficients: UInt32,
     val data: Data
 ) {
     data class Data(

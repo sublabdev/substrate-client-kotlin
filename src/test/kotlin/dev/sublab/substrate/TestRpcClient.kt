@@ -13,12 +13,12 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-class TestRpcClient {
+internal class TestRpcClient {
 
     private val client = RpcClient(KusamaNetwork().rpcUrl)
 
     @Test
-    internal fun testRpcError(): Unit = runBlocking {
+    fun testRpcError(): Unit = runBlocking {
         val request = RpcRequest(id = 1, method = "non_existing_method")
         val response = withContext(Dispatchers.IO) { client.send(request) }
 
@@ -26,7 +26,7 @@ class TestRpcClient {
     }
 
     @Test
-    internal fun testRpcRequest() = runBlocking {
+    fun testRpcRequest() = runBlocking {
         val requestId = (Long.MIN_VALUE..Long.MAX_VALUE).random()
         val request = RpcRequest(id = requestId, method = "state_getMetadata")
 
@@ -43,7 +43,7 @@ class TestRpcClient {
     }
 
     @Test
-    internal fun testSendRequest() = runBlocking {
+    fun testSendRequest() = runBlocking {
         val response = withContext(Dispatchers.IO) {
             client.sendRequest<Unit, String> {
                 method = "state_getMetadata"

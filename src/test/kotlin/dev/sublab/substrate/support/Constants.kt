@@ -3,7 +3,7 @@ package dev.sublab.substrate.support
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-object Constants {
+internal object Constants {
     const val testsCount = 1000
     val singleTestTimeout = 3.seconds
     val testsTimeout = 1.minutes

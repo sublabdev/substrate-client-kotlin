@@ -14,12 +14,11 @@ import okio.Path.Companion.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class TestRuntimeMetadata {
-
+internal class TestRuntimeMetadata {
     private val codec = ScaleCodec.default()
 
     @Test
-    internal fun testLocalParsing() = runBlocking {
+    fun testLocalParsing() = runBlocking {
         val fs = FileSystem.SYSTEM
         for (network in allNetworks()) {
             val path = (Constants.resourcesPath + network.localRuntimeMetadataSnapshot.path).toPath()
@@ -43,7 +42,7 @@ class TestRuntimeMetadata {
     }
 
     @Test
-    internal fun testRemoteParsing() = runBlocking {
+    fun testRemoteParsing() = runBlocking {
         for (network in allNetworks()) {
             val response = withContext(Dispatchers.IO) {
                 val client = RpcClient(network.rpcUrl)

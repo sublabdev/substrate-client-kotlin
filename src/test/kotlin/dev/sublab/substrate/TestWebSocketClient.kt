@@ -10,12 +10,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
-class TestWebSocketClient {
+internal class TestWebSocketClient {
     private fun echoClient(policy: WebSocketClientSubscriptionPolicy = WebSocketClientSubscriptionPolicy.NONE)
         = WebSocketClient(host = Constants.webSocketUrl, port = Constants.webSocketPort, policy = policy)
 
     @Test
-    internal fun testOne() = runBlocking {
+    fun testOne() = runBlocking {
         val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient()
@@ -30,7 +30,7 @@ class TestWebSocketClient {
     }
 
     @Test
-    internal fun testNone() = runBlocking {
+    fun testNone() = runBlocking {
         val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient()
@@ -53,7 +53,7 @@ class TestWebSocketClient {
     }
 
     @Test
-    internal fun testFirst(): Unit = runBlocking {
+    fun testFirst(): Unit = runBlocking {
         val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient(policy = WebSocketClientSubscriptionPolicy.FIRST_SUBSCRIBER)
@@ -87,7 +87,7 @@ class TestWebSocketClient {
     }
 
     @Test
-    internal fun testAll() = runBlocking {
+    fun testAll() = runBlocking {
         val testMessage = UUID.uuid4().toString()
 
         val echoClient = echoClient(policy = WebSocketClientSubscriptionPolicy.ALL_SUBSCRIBERS)
@@ -111,7 +111,7 @@ class TestWebSocketClient {
     }
 
     @Test
-    internal fun `verify first subscriber gets message, rest don't`() = runBlocking{
+    fun `verify first subscriber gets message, rest don't`() = runBlocking{
         val echoClient = echoClient(policy = WebSocketClientSubscriptionPolicy.FIRST_SUBSCRIBER)
 
         val testMessages = HashSet<String>()
