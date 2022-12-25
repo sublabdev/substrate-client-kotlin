@@ -23,8 +23,8 @@ internal class TestFetchingConstants {
     private val constants: List<RpcConstant<*>> = listOf(
         RpcConstant("babe", "epochDuration", UInt64::class, 600UL),
         RpcConstant("babe", "expectedBlockTime", UInt64::class, 6000UL),
-        RpcConstant("balances", "existentialDeposit", UInt64::class, 33333333UL),
-        RpcConstant("crowdloan", "minContribution", UInt64::class, 99999999000UL),
+        RpcConstant("balances", "existentialDeposit", UInt128::class, UInt128("333333333")),
+        RpcConstant("crowdloan", "minContribution", UInt128::class, UInt128("999999999000")),
         RpcConstant("staking", "bondingDuration", UInt32::class, 28U),
         RpcConstant("staking", "maxNominations", UInt32::class, 24U),
         RpcConstant("staking", "sessionsPerEra", UInt32::class, 6U),
