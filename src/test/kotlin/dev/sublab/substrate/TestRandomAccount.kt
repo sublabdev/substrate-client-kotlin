@@ -30,7 +30,7 @@ internal class TestRandomAccount {
             val keyPair = factory.generate()
             val accountId = keyPair.publicKey.ss58.accountId().asByteArrayConvertible()
 
-            val account = client.storageService
+            val account = client.storage
                 .fetch("system", "account", accountId, Account::class)
                 .first()
 

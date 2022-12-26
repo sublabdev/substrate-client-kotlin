@@ -40,7 +40,7 @@ class SubstrateClient(
         return runtimeMetadata.filterNotNull()
     }
 
-    val lookupService = SubstrateLookupService(getRuntime(), settings.namingPolicy)
-    val constantsService = SubstrateConstantsService(codecProvider.byteArray, lookupService)
-    val storageService = SubstrateStorageService(codecProvider.byteArray, lookupService, modules.stateRpc())
+    val lookup = SubstrateLookupService(getRuntime(), settings.namingPolicy)
+    val constants = SubstrateConstantsService(codecProvider.byteArray, lookup)
+    val storage = SubstrateStorageService(codecProvider.byteArray, lookup, modules.stateRpc())
 }

@@ -9,7 +9,6 @@ import dev.sublab.substrate.modules.system.storage.Account
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.KusamaNetwork
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -53,7 +52,7 @@ class TestFetchingStorage {
 
     @Test
     internal fun testService() {
-        val service = SubstrateStorageService(ScaleCodec.default(), client.lookupService, client.modules.stateRpc())
+        val service = SubstrateStorageService(ScaleCodec.default(), client.lookup, client.modules.stateRpc())
         for (item in items) {
             testStorageItem(service, item)
         }
@@ -62,7 +61,7 @@ class TestFetchingStorage {
     @Test
     internal fun testClient() {
         for (item in items) {
-            testStorageItem(client.storageService, item)
+            testStorageItem(client.storage, item)
         }
     }
 

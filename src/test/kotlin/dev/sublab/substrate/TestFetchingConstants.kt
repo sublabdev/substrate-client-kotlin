@@ -36,7 +36,7 @@ internal class TestFetchingConstants {
 
     @Test
     fun testService() = runBlocking {
-        val service = SubstrateConstantsService(ScaleCodec.default(), client.lookupService)
+        val service = SubstrateConstantsService(ScaleCodec.default(), client.lookup)
         for (constant in constants) {
             testConstant(service, constant)
         }
@@ -45,7 +45,7 @@ internal class TestFetchingConstants {
     @Test
     fun testClient() = runBlocking {
         for (constant in constants) {
-            testConstant(client.constantsService, constant)
+            testConstant(client.constants, constant)
         }
     }
 
