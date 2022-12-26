@@ -1,6 +1,5 @@
 package dev.sublab.substrate
 
-import dev.sublab.hex.hex
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.metadata.RuntimeMetadata
 import dev.sublab.substrate.rpcClient.RpcClient
@@ -15,7 +14,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 internal class TestRuntimeMetadata {
-    private val codec = ScaleCodec.default()
+    private val codec = ScaleCodec.hex()
 
     @Test
     fun testLocalParsing() = runBlocking {
@@ -27,7 +26,7 @@ internal class TestRuntimeMetadata {
                 continue
             }
 
-            val metadataEncoded = fs.read(path) { readUtf8() }.hex.decode()
+            val metadataEncoded = fs.read(path) { readUtf8() }
             try {
                 val metadataDecoded = codec.fromScale(metadataEncoded, RuntimeMetadata::class)
 
@@ -52,10 +51,8 @@ internal class TestRuntimeMetadata {
                 }
             }
 
-            val metadataEncoded = response.hex.decode()
-
             try {
-                val metadataDecoded = codec.fromScale(metadataEncoded, RuntimeMetadata::class)
+                val metadataDecoded = codec.fromScale(response, RuntimeMetadata::class)
 
                 println("metadata from ${network.rpcUrl} magic number: ${metadataDecoded.magicNumber}, version: ${metadataDecoded.version}")
                 assertEquals(metadataDecoded.version, 14u)

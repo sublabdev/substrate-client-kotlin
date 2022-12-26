@@ -1,6 +1,7 @@
 package dev.sublab.substrate
 
 import dev.sublab.common.numerics.*
+import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.support.KusamaNetwork
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
@@ -35,7 +36,7 @@ internal class TestFetchingConstants {
 
     @Test
     fun testService() = runBlocking {
-        val service = SubstrateConstantsService(client.codec, client.lookupService)
+        val service = SubstrateConstantsService(ScaleCodec.default(), client.lookupService)
         for (constant in constants) {
             testConstant(service, constant)
         }

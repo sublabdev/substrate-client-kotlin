@@ -4,11 +4,14 @@ import dev.sublab.common.ByteArrayConvertible
 import dev.sublab.common.asByteArrayConvertible
 import dev.sublab.common.numerics.UInt64
 import dev.sublab.hex.hex
+import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.modules.system.storage.Account
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.KusamaNetwork
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import java.math.BigInteger
 import kotlin.reflect.KClass
 import kotlin.test.Test
@@ -28,10 +31,10 @@ class TestFetchingStorage {
     private val client = SubstrateClient(url = network.rpcUrl)
 
     private val items: List<RpcStorageItem<*>> = listOf(
-//        RpcStorageItem("timestamp", "now", UInt64::class) {
-//            // Difference should be within one minute, let's assume some big lag
-//            (Clock.System.now() - Instant.fromEpochMilliseconds(it.toLong())).inWholeSeconds < Constants.testsTimeout.inWholeSeconds
-//        },
+        RpcStorageItem("timestamp", "now", UInt64::class) {
+            // Difference should be within one minute, let's assume some big lag
+            (Clock.System.now() - Instant.fromEpochMilliseconds(it.toLong())).inWholeSeconds < Constants.testsTimeout.inWholeSeconds
+        },
         RpcStorageItem("system", "account", Account::class, keys = listOf(
             "0xd857fcac7bd9bb03551d70b9743895a98b74b06e54bdc34f1b27ab240356857d".hex.decode().asByteArrayConvertible()
         )) { account ->
@@ -45,7 +48,7 @@ class TestFetchingStorage {
 
     @Test
     internal fun testService() {
-        val service = SubstrateStorageService(client.codec, client.lookupService, client.modules.stateRpc())
+        val service = SubstrateStorageService(ScaleCodec.default(), client.lookupService, client.modules.stateRpc())
         for (item in items) {
             testStorageItem(service, item)
         }

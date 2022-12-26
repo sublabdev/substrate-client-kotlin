@@ -13,12 +13,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 
+typealias HexScaleCodec = ScaleCodec<String>
+
 class SubstrateClient(
     url: String,
     settings: SubstrateClientSettings = SubstrateClientSettings.default(),
-    internal val codec: ScaleCodec<ByteArray> = ScaleCodec.default(),
+    private val codecProvider: ScaleCodecProvider = ScaleCodecProvider.default(),
     private val hashers: HashersProvider = DefaultHashersProvider(),
-    val modules: ModuleRpcProvider = DefaultModuleRpcProvider(codec, RpcClient(url), hashers),
+    val modules: ModuleRpcProvider = DefaultModuleRpcProvider(codecProvider, RpcClient(url), hashers),
 ) {
 
     private val webSocketClient = WebSocketClient(
@@ -39,6 +41,6 @@ class SubstrateClient(
     }
 
     val lookupService = SubstrateLookupService(getRuntime(), settings.namingPolicy)
-    val constantsService = SubstrateConstantsService(codec, lookupService)
-    val storageService = SubstrateStorageService(codec, lookupService, modules.stateRpc())
+    val constantsService = SubstrateConstantsService(codecProvider.byteArray, lookupService)
+    val storageService = SubstrateStorageService(codecProvider.byteArray, lookupService, modules.stateRpc())
 }
