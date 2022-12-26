@@ -5,13 +5,12 @@ import dev.sublab.substrate.metadata.RuntimeMetadata
 import dev.sublab.substrate.rpcClient.RpcClient
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.allNetworks
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import okio.FileSystem
 import okio.Path.Companion.toPath
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 internal class TestRuntimeMetadata {
     private val codec = ScaleCodec.hex()
@@ -43,13 +42,13 @@ internal class TestRuntimeMetadata {
     @Test
     fun testRemoteParsing() = runBlocking {
         for (network in allNetworks()) {
-            val response = withContext(Dispatchers.IO) {
-                val client = RpcClient(network.rpcUrl)
-                client.sendRequest<Unit, String> {
-                    method = "state_getMetadata"
-                    responseType = String::class
-                }
+            val client = RpcClient(network.rpcUrl)
+            val response = client.sendRequest<Unit, String> {
+                method = "state_getMetadata"
+                responseType = String::class
             }
+
+            assertNotNull(response)
 
             try {
                 val metadataDecoded = codec.fromScale(response, RuntimeMetadata::class)

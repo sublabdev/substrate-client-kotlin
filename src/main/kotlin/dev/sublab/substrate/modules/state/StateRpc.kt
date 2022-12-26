@@ -11,27 +11,27 @@ import dev.sublab.substrate.rpcClient.RpcClient
 import kotlin.reflect.KClass
 
 interface StateRpc {
-    suspend fun getRuntimeMetadata(): RuntimeMetadata
+    suspend fun getRuntimeMetadata(): RuntimeMetadata?
 
     suspend fun <T: Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
         storage: RuntimeModuleStorage,
         type: KClass<T>
-    ): T
+    ): T?
 
     suspend fun <T: Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
         key: ByteArrayConvertible,
         storage: RuntimeModuleStorage,
         type: KClass<T>
-    ): T
+    ): T?
 
     suspend fun <T: Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
         keys: List<ByteArrayConvertible>,
         storage: RuntimeModuleStorage,
         type: KClass<T>
-    ): T
+    ): T?
 }
 
 class StateRpcClient(
@@ -42,7 +42,7 @@ class StateRpcClient(
     override suspend fun getRuntimeMetadata() = rpcClient.sendRequest<Unit, String> {
         method = "state_getMetadata"
         responseType = String::class
-    }.let {
+    }?.let {
         codec.fromScale(it, RuntimeMetadata::class)
     }
 
@@ -54,7 +54,7 @@ class StateRpcClient(
         responseType = String::class
         paramsType = String::class
         params = listOf(key.hex.encode(true))
-    }.let {
+    }?.let {
         codec.fromScale(it, type)
     }
 

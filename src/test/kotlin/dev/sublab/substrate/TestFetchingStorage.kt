@@ -8,6 +8,7 @@ import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.modules.system.storage.Account
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.KusamaNetwork
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
@@ -23,7 +24,7 @@ private data class RpcStorageItem<T: Any>(
     val item: String,
     val type: KClass<T>,
     val keys: List<ByteArrayConvertible> = listOf(),
-    val validation: ((T) -> Boolean)? = null
+    val validation: ((T?) -> Boolean)? = null
 )
 
 class TestFetchingStorage {
@@ -33,13 +34,17 @@ class TestFetchingStorage {
     private val items: List<RpcStorageItem<*>> = listOf(
         RpcStorageItem("timestamp", "now", UInt64::class) {
             // Difference should be within one minute, let's assume some big lag
+            if (it == null) return@RpcStorageItem false
+
             (Clock.System.now() - Instant.fromEpochMilliseconds(it.toLong())).inWholeSeconds < Constants.testsTimeout.inWholeSeconds
         },
         RpcStorageItem("system", "account", Account::class, keys = listOf(
             "0xd857fcac7bd9bb03551d70b9743895a98b74b06e54bdc34f1b27ab240356857d".hex.decode().asByteArrayConvertible()
         )) { account ->
             // Random Kusama validator account, as long as it participates in validation, all field should be > 0
-            account.data.feeFrozen.value > BigInteger.ZERO &&
+            if (account == null) return@RpcStorageItem false
+
+            account.data.free.value > BigInteger.ZERO &&
             account.data.reserved.value > BigInteger.ZERO &&
             account.data.miscFrozen.value > BigInteger.ZERO &&
             account.data.feeFrozen.value > BigInteger.ZERO
@@ -62,16 +67,17 @@ class TestFetchingStorage {
     }
 
     private fun <T: Any> testStorageItem(service: SubstrateStorageService, item: RpcStorageItem<T>) = runBlocking {
-        service.fetch(item.module, item.item, item.keys, item.type).take(1).collect {
-            assertNotNull(it)
+        run {
+            val storageItem = service.fetch(item.module, item.item, item.keys, item.type).first()
             item.validation?.let { isValid ->
-                assertTrue(isValid(it))
+                assertTrue(isValid(storageItem))
             }
         }
 
-        service.find(item.module, item.item).take(1).collect {
-            assertNotNull(it)
-            val value = service.fetch(it.item, item.keys, it.storage, item.type)
+        run {
+            val storageItem = service.find(item.module, item.item).first()
+            assertNotNull(storageItem)
+            val value = service.fetch(storageItem.item, item.keys, storageItem.storage, item.type)
             item.validation?.let { isValid ->
                 assertTrue(isValid(value))
             }

@@ -50,14 +50,16 @@ internal class TestFetchingConstants {
     }
 
     private fun <T: Any> testConstant(service: SubstrateConstantsService, constant: RpcConstant<T>) = runBlocking {
-        service.fetch(constant.module, constant.constant, constant.type).take(1).collect {
-            assertEquals(constant.expectedValue, it)
+        run {
+            val fetchedConstant = service.fetch(constant.module, constant.constant, constant.type).first()
+            assertEquals(constant.expectedValue, fetchedConstant)
         }
 
-        service.find(constant.module, constant.constant).take(1).collect {
-            assertNotNull(it)
-            val value = service.fetch(it, constant.type)
-            assertEquals(constant.expectedValue, value)
+        run {
+            val foundConstant = service.find(constant.module, constant.constant).first()
+            assertNotNull(foundConstant)
+            val fetchedConstant = service.fetch(foundConstant, constant.type)
+            assertEquals(constant.expectedValue, fetchedConstant)
         }
     }
 }

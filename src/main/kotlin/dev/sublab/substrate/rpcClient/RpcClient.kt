@@ -17,7 +17,6 @@ import kotlin.reflect.full.createInstance
 internal const val rpcVersion = "2.0"
 
 open class RpcResponseErrorException(override val message: String): Throwable()
-class UnknownRpcResponseError: RpcResponseErrorException("unknown error")
 
 class RpcRequestBuilder<P: Any, R: Any>(
     var method: String = "",
@@ -36,7 +35,7 @@ class RpcClient(
         }
     }
 
-    private var requestCounter: Long = 1
+    private var requestCounter: Long = 0
 
     suspend fun send(request: RpcRequest): RpcResponse = httpClient.post {
         url {
@@ -47,7 +46,7 @@ class RpcClient(
         }
     }.body()
 
-    suspend fun <P: Any, R: Any> sendRequest(block: RpcRequestBuilder<P, R>.() -> Unit): R {
+    suspend fun <P: Any, R: Any> sendRequest(block: RpcRequestBuilder<P, R>.() -> Unit): R? {
         val builder = RpcRequestBuilder<P, R>()
         block(builder)
 
@@ -66,11 +65,14 @@ class RpcClient(
         )
 
         val rpcResponse = send(request)
-        val result = rpcResponse.result ?: run {
-            val error = rpcResponse.error ?: throw UnknownRpcResponseError()
-            throw RpcResponseErrorException(error.message)
+        println("builder: $params, request: $request")
+
+        rpcResponse.error?.let {
+            throw RpcResponseErrorException(it.message)
         }
 
-        return Json.decodeFromJsonElement(responseSerializer, result)
+        return rpcResponse.result?.let {
+            Json.decodeFromJsonElement(responseSerializer, it)
+        }
     }
 }
