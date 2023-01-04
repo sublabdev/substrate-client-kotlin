@@ -1,19 +1,19 @@
 package dev.sublab.substrate.modules.system.storage
 
-import dev.sublab.common.numerics.UInt128
-import dev.sublab.common.numerics.UInt32
+import dev.sublab.substrate.scale.Balance
+import dev.sublab.substrate.scale.Index
 
 data class Account(
-    val nonce: UInt32,
-    val consumers: UInt32,
-    val providers: UInt32,
-    val sufficients: UInt32,
+    val nonce: Index,
+    val consumers: Index,
+    val providers: Index,
+    val sufficients: Index,
     val data: Data
 ) {
     data class Data(
-        val free: UInt128,
-        val reserved: UInt128,
-        val miscFrozen: UInt128,
-        val feeFrozen: UInt128
+        val free: Balance,
+        val reserved: Balance,
+        val miscFrozen: Balance,
+        val feeFrozen: Balance
     )
 }

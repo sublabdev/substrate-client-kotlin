@@ -6,6 +6,7 @@ import dev.sublab.substrate.metadata.modules.RuntimeModuleConstant
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage
 import dev.sublab.substrate.metadata.modules.storage.item.RuntimeModuleStorageItem
 import kotlinx.coroutines.flow.*
+import java.math.BigInteger
 
 private data class ModulePath(
     val moduleName: String,
@@ -14,55 +15,69 @@ private data class ModulePath(
 
 class SubstrateLookupService(
     private val runtimeMetadata: Flow<RuntimeMetadata>,
-    private val namingPolicy: SubstrateClientNamingPolicy,
+    private val namingPolicy: SubstrateClientNamingPolicy
 ) {
-
-    private fun equals(lhs: String, rhs: String) = when (namingPolicy) {
-        SubstrateClientNamingPolicy.NONE -> lhs == rhs
-        SubstrateClientNamingPolicy.CASE_INSENSITIVE -> lhs.lowercase() == rhs.lowercase()
+    private fun lookupAsFlow() = runtimeMetadata.map {
+        SubstrateLookup(it, namingPolicy)
     }
 
-    private var modulesCache: MutableMap<String, RuntimeModule> = mutableMapOf()
-    private var constantsCache: MutableMap<ModulePath, RuntimeModuleConstant> = mutableMapOf()
-    private var storageItemsCache: MutableMap<ModulePath, RuntimeModuleStorageItem> = mutableMapOf()
+    fun findModule(name: String) = lookupAsFlow().map {
+        it.findModule(name)
+    }
 
-    private fun findModule(metadata: RuntimeMetadata, name: String): RuntimeModule? {
+    fun findConstant(moduleName: String, constantName: String) = lookupAsFlow().map {
+        it.findConstant(moduleName, constantName)
+    }
+
+    fun findStorageItem(moduleName: String, itemName: String) = lookupAsFlow().map {
+        it.findStorageItem(moduleName, itemName)
+    }
+
+    fun findRuntimeType(index: BigInteger) = lookupAsFlow().map {
+        it.findRuntimeType(index)
+    }
+}
+
+data class FindStorageItemResult(val item: RuntimeModuleStorageItem, val storage: RuntimeModuleStorage)
+
+private class SubstrateLookup(
+    private val runtimeMetadata: RuntimeMetadata,
+    private val namingPolicy: SubstrateClientNamingPolicy
+) {
+
+    private val modulesCache: MutableMap<String, RuntimeModule> = mutableMapOf()
+    private val constantsCache: MutableMap<ModulePath, RuntimeModuleConstant> = mutableMapOf()
+    private val storageItemsCache: MutableMap<ModulePath, RuntimeModuleStorageItem> = mutableMapOf()
+
+    fun findModule(name: String): RuntimeModule? {
         val module = modulesCache[name]
-            ?: metadata.modules.firstOrNull { equals(it.name, name) }
+            ?: runtimeMetadata.modules.firstOrNull { namingPolicy.equals(it.name, name) }
             ?: return null
 
         modulesCache[name] = module
         return module
     }
 
-    fun findModule(name: String) = runtimeMetadata.map { metadata ->
-        findModule(metadata, name)
-    }
-
     private fun findConstant(module: RuntimeModule, name: String): RuntimeModuleConstant? {
         val constantPath = ModulePath(module.name, name)
         val constant = constantsCache[constantPath]
-            ?: module.constants.firstOrNull { equals(it.name, name) }
+            ?: module.constants.firstOrNull { namingPolicy.equals(it.name, name) }
             ?: return null
 
         constantsCache[constantPath] = constant
         return constant
     }
 
-    fun findConstant(moduleName: String, constantName: String) = findModule(moduleName).map {
-        it?.let {
-            findConstant(it, constantName)
-        }
+    fun findConstant(moduleName: String, constantName: String) = findModule(moduleName)?.let {
+        findConstant(it, constantName)
     }
-
-    data class FindStorageItemResult(val item: RuntimeModuleStorageItem, val storage: RuntimeModuleStorage)
 
     private fun findStorageItem(module: RuntimeModule, name: String): FindStorageItemResult? {
         val storage = module.storage ?: return null
 
         val constantPath = ModulePath(module.name, name)
         val item = storageItemsCache[constantPath]
-            ?: module.storage.items.firstOrNull { equals(it.name, name) }
+            ?: module.storage.items.firstOrNull { namingPolicy.equals(it.name, name) }
             ?: return null
 
         storageItemsCache[constantPath] = item
@@ -70,9 +85,9 @@ class SubstrateLookupService(
         return FindStorageItemResult(item, storage)
     }
 
-    fun findStorageItem(moduleName: String, itemName: String) = findModule(moduleName).map {
-        it?.let {
-            findStorageItem(it, itemName)
-        }
+    fun findStorageItem(moduleName: String, itemName: String) = findModule(moduleName)?.let {
+        findStorageItem(it, itemName)
     }
+
+    fun findRuntimeType(index: BigInteger) = runtimeMetadata.lookup.findItemByIndex(index)
 }

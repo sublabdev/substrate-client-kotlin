@@ -9,7 +9,7 @@ data class RuntimeTypeDefVariant(
     data class Variant(
         val name: String,
         val fields: List<RuntimeTypeDefField>,
-        private val indexUInt8: UInt8,
+        internal val indexUInt8: UInt8,
         val docs: List<String>
     ) {
 

@@ -40,4 +40,8 @@ internal class WestendNetwork: Network {
     }
 }
 
-internal fun allNetworks() = listOf(PolkadotNetwork(), KusamaNetwork(), WestendNetwork())
+internal fun allNetworks() = listOf(
+    PolkadotNetwork(),
+    KusamaNetwork(),
+    WestendNetwork()
+)

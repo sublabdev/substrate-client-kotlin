@@ -1,10 +1,13 @@
 package dev.sublab.substrate
 
+import dev.sublab.hex.hex
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.metadata.RuntimeMetadata
+import dev.sublab.substrate.modules.system.constants.RuntimeVersion
 import dev.sublab.substrate.rpcClient.RpcClient
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.allNetworks
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okio.FileSystem
 import okio.Path.Companion.toPath
@@ -59,6 +62,15 @@ internal class TestRuntimeMetadata {
                 println("Exception: $e")
                 throw e
             }
+        }
+    }
+
+    @Test
+    fun testRuntimeVersion() = runBlocking {
+        for (network in allNetworks()) {
+            val client = SubstrateClient(network.rpcUrl)
+            val runtimeVersion = client.modules.systemRpc().runtimeVersion().first()
+            assertNotNull(runtimeVersion)
         }
     }
 }

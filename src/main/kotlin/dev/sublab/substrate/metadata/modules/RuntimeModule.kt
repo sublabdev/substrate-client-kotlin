@@ -7,11 +7,11 @@ import java.math.BigInteger
 data class RuntimeModule(
     val name: String,
     val storage: RuntimeModuleStorage?,
-    private val callIndex: BigInteger?,
-    private val eventsIndex: BigInteger?,
+    val callIndex: BigInteger?,
+    val eventsIndex: BigInteger?,
     val constants: List<RuntimeModuleConstant>,
-    private val errorsIndex: BigInteger?,
-    private val indexUInt8: UInt8
+    val errorsIndex: BigInteger?,
+    val indexUInt8: UInt8
 ) {
 
     val index: UInt32 get() = indexUInt8.toUInt()

@@ -5,6 +5,7 @@ import dev.sublab.substrate.hashers.DefaultHashersProvider
 import dev.sublab.substrate.hashers.HashersProvider
 import dev.sublab.substrate.metadata.RuntimeMetadata
 import dev.sublab.substrate.modules.DefaultModuleRpcProvider
+import dev.sublab.substrate.modules.InternalModuleRpcProvider
 import dev.sublab.substrate.modules.ModuleRpcProvider
 import dev.sublab.substrate.rpcClient.RpcClient
 import dev.sublab.substrate.utils.JobWithTimeout
@@ -20,8 +21,10 @@ class SubstrateClient(
     settings: SubstrateClientSettings = SubstrateClientSettings.default(),
     private val codecProvider: ScaleCodecProvider = ScaleCodecProvider.default(),
     private val hashers: HashersProvider = DefaultHashersProvider(),
-    val modules: ModuleRpcProvider = DefaultModuleRpcProvider(codecProvider, RpcClient(url), hashers),
+    private val moduleRpcProvider: InternalModuleRpcProvider = DefaultModuleRpcProvider(codecProvider, RpcClient(url), hashers),
 ) {
+
+    val modules: ModuleRpcProvider get() = moduleRpcProvider
 
     private val webSocketClient = WebSocketClient(
         host = url,
@@ -35,7 +38,7 @@ class SubstrateClient(
     }
 
     private suspend fun loadRuntime() = modules.stateRpc().getRuntimeMetadata()
-    private fun getRuntime(): Flow<RuntimeMetadata> {
+    internal fun getRuntime(): Flow<RuntimeMetadata> {
         runtimeMetadataUpdate.perform()
         return runtimeMetadata.filterNotNull()
     }
@@ -43,4 +46,11 @@ class SubstrateClient(
     val lookup = SubstrateLookupService(getRuntime(), settings.namingPolicy)
     val constants = SubstrateConstantsService(codecProvider.byteArray, lookup)
     val storage = SubstrateStorageService(codecProvider.byteArray, lookup, modules.stateRpc())
+    val extrinsics = SubstrateExtrinsicsService(getRuntime(), codecProvider.byteArray, lookup, settings.namingPolicy)
+
+    init {
+        // Supply dependencies
+        moduleRpcProvider.workingWithClient(this)
+        codecProvider.applyRuntimeMetadata(getRuntime())
+    }
 }
