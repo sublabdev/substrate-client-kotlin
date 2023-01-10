@@ -16,7 +16,7 @@ import kotlin.test.Test
 
 internal class TestDynamicTypes {
     private val network = KusamaNetwork()
-    private val client = SubstrateClient(url = network.rpcUrl)
+    private val client = network.makeClient()
 
     private val adapterProvider = DefaultScaleCodecAdapterProvider()
     private val dynamicAdapterProvider = DynamicAdapterProvider(adapterProvider, client.getRuntime())

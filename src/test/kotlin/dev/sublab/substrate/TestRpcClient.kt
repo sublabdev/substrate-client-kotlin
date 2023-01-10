@@ -1,6 +1,5 @@
 package dev.sublab.substrate
 
-import dev.sublab.substrate.rpcClient.RpcClient
 import dev.sublab.substrate.rpcClient.RpcRequest
 import dev.sublab.substrate.support.KusamaNetwork
 import kotlinx.coroutines.runBlocking
@@ -11,8 +10,8 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 internal class TestRpcClient {
-
-    private val client = RpcClient(KusamaNetwork().rpcUrl)
+    private val network = KusamaNetwork()
+    private val client = network.makeRpcClient()
 
     @Test
     fun testRpcError(): Unit = runBlocking {

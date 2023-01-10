@@ -19,8 +19,10 @@ enum class WebSocketClientSubscriptionPolicy {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class WebSocketClient(
+    secure: Boolean = false,
     host: String,
     path: String? = null,
+    params: Map<String, Any?> = mapOf(),
     port: Int? = null,
     private val policy: WebSocketClientSubscriptionPolicy = WebSocketClientSubscriptionPolicy.NONE
 ) {
@@ -37,16 +39,30 @@ class WebSocketClient(
 
     init {
         clientScope.launch {
-            client.webSocket(host = host, path = path, port = port) {
+            var fullPath = path
+            if (fullPath != null && params.isNotEmpty()) {
+                fullPath += "?${
+                    params.map { "${it.key}=${it.value}" }.joinToString("&")
+                }"
+            }
+
+            val setupBlock: suspend DefaultClientWebSocketSession.() -> Unit = {
+                val session = this
                 try {
-                    val receive = launch { receive(this@webSocket) }
-                    val send = launch { send(this@webSocket) }
+                    val receive = launch { receive(session) }
+                    val send = launch { send(session) }
 
                     receive.join()
                     send.cancelAndJoin()
                 } catch (e: Exception) {
                     error.send(e)
                 }
+            }
+
+            if (secure) {
+                client.wss(host = host, path = fullPath, port = port, block = setupBlock)
+            } else {
+                client.webSocket(host = host, path = fullPath, port = port, block = setupBlock)
             }
         }
     }

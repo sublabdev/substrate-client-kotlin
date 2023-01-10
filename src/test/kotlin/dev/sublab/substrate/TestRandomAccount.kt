@@ -21,7 +21,7 @@ import kotlin.test.assertNull
 
 internal class TestRandomAccount {
     private val network = KusamaNetwork()
-    private val client = SubstrateClient(url = network.rpcUrl)
+    private val client = network.makeClient()
 
     private val factories = listOf(
         KeyPair.Factory.ecdsa(Kind.SUBSTRATE),

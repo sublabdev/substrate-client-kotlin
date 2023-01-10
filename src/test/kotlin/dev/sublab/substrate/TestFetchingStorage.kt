@@ -28,7 +28,7 @@ private data class RpcStorageItem<T: Any>(
 
 class TestFetchingStorage {
     private val network = KusamaNetwork()
-    private val client = SubstrateClient(url = network.rpcUrl)
+    private val client = network.makeClient()
 
     private val items: List<RpcStorageItem<*>> = listOf(
         RpcStorageItem("timestamp", "now", UInt64::class) {

@@ -1,6 +1,7 @@
 package dev.sublab.substrate
 
 import dev.sublab.encrypting.keys.KeyPair
+import dev.sublab.encrypting.signing.SignatureEngine
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.ss58.AccountId
 import dev.sublab.ss58.ss58
@@ -10,6 +11,8 @@ import dev.sublab.substrate.metadata.lookup.RuntimeType
 import dev.sublab.substrate.metadata.lookup.type.RuntimeTypeDef
 import dev.sublab.substrate.metadata.lookup.type.def.RuntimeTypeDefVariant
 import dev.sublab.substrate.metadata.modules.RuntimeModule
+import dev.sublab.substrate.modules.chain.ChainRpc
+import dev.sublab.substrate.modules.system.SystemRpc
 import dev.sublab.substrate.scale.Balance
 import dev.sublab.substrate.scale.Index
 import dev.sublab.sugar.or
@@ -21,6 +24,8 @@ private data class RuntimeCall(val module: RuntimeModule, val variant: RuntimeTy
 
 class SubstrateExtrinsicsService(
     private val runtimeMetadata: Flow<RuntimeMetadata>,
+    private val systemRpc: SystemRpc,
+    private val chainRpc: ChainRpc,
     private val codec: ScaleCodec<ByteArray>,
     private val lookup: SubstrateLookupService,
     private val namingPolicy: SubstrateClientNamingPolicy
@@ -39,6 +44,7 @@ class SubstrateExtrinsicsService(
         ?.let { lookup.findRuntimeType(it) }.or(flowOf<RuntimeType?>(null))
         .map { runtimeType ->
             findCall(runtimeType?.def, callName)?.let {
+                println("call with '${module.name}_$callName' index: ${module.index}, ${it.index}")
                 RuntimeCall(module, it)
             }
         }
@@ -57,13 +63,14 @@ class SubstrateExtrinsicsService(
     ) = findCall(moduleName, callName)
         .first()
         ?.let { UnsignedPayload(codec, it.module, it.variant, callValue, callValueType) }
+        ?: throw RuntimeCallUnknownException()
 
     internal suspend fun <T: Any> makeUnsigned(
         moduleName: String,
         callName: String,
         callValue: T,
         callValueType: KClass<T>
-    ): Payload? = makePayload(moduleName, callName, callValue, callValueType)
+    ): Payload = makePayload(moduleName, callName, callValue, callValueType)
 
     suspend fun <T: Any> makeUnsigned(call: Call<T>) = makeUnsigned(
         moduleName = call.moduleName,
@@ -79,24 +86,24 @@ class SubstrateExtrinsicsService(
         callValueType: KClass<T>,
         tip: Balance,
         accountId: AccountId,
-        signatureBlock: SignatureBlock
-    ): Payload? = makePayload(moduleName, callName, callValue, callValueType)?.let {
-        SignedPayload(
-            runtimeMetadata = runtimeMetadata.first(),
-            codec = codec,
-            payload = it,
-            accountId = accountId,
-            nonce = Index(BigInteger.valueOf(1)), // TODO: Provide nonce
-            tip = tip,
-            signatureBlock = signatureBlock
-        )
-    }
+        signatureEngine: SignatureEngine
+    ): Payload = SignedPayload(
+        runtimeMetadata = runtimeMetadata.first(),
+        codec = codec,
+        payload = makePayload(moduleName, callName, callValue, callValueType),
+        runtimeVersion = systemRpc.runtimeVersion() ?: throw RuntimeVersionNotKnownException(),
+        genesisHash = chainRpc.getBlockHash(0) ?: throw GenesisHashNotKnownException(),
+        accountId = accountId,
+        nonce = Index(BigInteger.valueOf(1)), // TODO: Provide nonce
+        tip = tip,
+        signatureEngine = signatureEngine
+    )
 
     suspend fun <T: Any> makeSigned(
         call: Call<T>,
         tip: Balance,
         accountId: AccountId,
-        signatureBlock: SignatureBlock
+        signatureEngine: SignatureEngine
     ) = makeSigned(
         moduleName = call.moduleName,
         callName = call.name,
@@ -104,14 +111,12 @@ class SubstrateExtrinsicsService(
         callValueType = call.type,
         tip = tip,
         accountId = accountId,
-        signatureBlock = signatureBlock
+        signatureEngine = signatureEngine
     )
 
     suspend fun <T: Any> makeSigned(
         call: Call<T>,
         tip: Balance,
         keyPair: KeyPair
-    ) = makeSigned(call, tip, keyPair.publicKey.ss58.accountId()) {
-        keyPair.sign(it)
-    }
+    ) = makeSigned(call, tip, keyPair.publicKey.ss58.accountId(), keyPair.getSignatureEngine(keyPair.privateKey))
 }

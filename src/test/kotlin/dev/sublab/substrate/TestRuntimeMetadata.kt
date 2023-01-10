@@ -1,13 +1,9 @@
 package dev.sublab.substrate
 
-import dev.sublab.hex.hex
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.metadata.RuntimeMetadata
-import dev.sublab.substrate.modules.system.constants.RuntimeVersion
-import dev.sublab.substrate.rpcClient.RpcClient
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.allNetworks
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import okio.FileSystem
 import okio.Path.Companion.toPath
@@ -32,7 +28,7 @@ internal class TestRuntimeMetadata {
             try {
                 val metadataDecoded = codec.fromScale(metadataEncoded, RuntimeMetadata::class)
 
-                println("metadata from ${network.rpcUrl} magic number: ${metadataDecoded.magicNumber}, version: ${metadataDecoded.version}")
+                println("metadata from ${network.url} magic number: ${metadataDecoded.magicNumber}, version: ${metadataDecoded.version}")
                 assertEquals(metadataDecoded.version, 14u)
                 assertEquals(metadataDecoded.magicNumber, network.localRuntimeMetadataSnapshot.magicNumber)
             } catch (e: Exception) {
@@ -45,7 +41,7 @@ internal class TestRuntimeMetadata {
     @Test
     fun testRemoteParsing() = runBlocking {
         for (network in allNetworks()) {
-            val client = RpcClient(network.rpcUrl)
+            val client = network.makeRpcClient()
             val response = client.sendRequest<Unit, String> {
                 method = "state_getMetadata"
                 responseType = String::class
@@ -56,7 +52,7 @@ internal class TestRuntimeMetadata {
             try {
                 val metadataDecoded = codec.fromScale(response, RuntimeMetadata::class)
 
-                println("metadata from ${network.rpcUrl} magic number: ${metadataDecoded.magicNumber}, version: ${metadataDecoded.version}")
+                println("metadata from ${network.url} magic number: ${metadataDecoded.magicNumber}, version: ${metadataDecoded.version}")
                 assertEquals(metadataDecoded.version, 14u)
             } catch (e: Exception) {
                 println("Exception: $e")
@@ -68,9 +64,19 @@ internal class TestRuntimeMetadata {
     @Test
     fun testRuntimeVersion() = runBlocking {
         for (network in allNetworks()) {
-            val client = SubstrateClient(network.rpcUrl)
-            val runtimeVersion = client.modules.systemRpc().runtimeVersion().first()
+            val client = network.makeClient()
+            val runtimeVersion = client.modules.systemRpc().runtimeVersion()
             assertNotNull(runtimeVersion)
+        }
+    }
+
+    @Test
+    fun testGenesisHash() = runBlocking {
+        for (network in allNetworks()) {
+            val client = network.makeClient()
+            val genesisHash = client.modules.chainRpc().getBlockHash(0)
+            assertNotNull(genesisHash)
+            assertEquals(network.genesisHash, genesisHash)
         }
     }
 }

@@ -19,7 +19,7 @@ private data class RpcConstant<T: Any>(
 
 internal class TestFetchingConstants {
     private val network = KusamaNetwork()
-    private val client = SubstrateClient(url = network.rpcUrl)
+    private val client = network.makeClient()
 
     private val constants: List<RpcConstant<*>> = listOf(
         RpcConstant("babe", "epochDuration", UInt64::class, 600UL),

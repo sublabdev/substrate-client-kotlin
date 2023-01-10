@@ -23,7 +23,11 @@ internal class UnsignedPayload<T: Any>(
         .commit()
 }
 
-internal fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.append(unsignedPayload: UnsignedPayload<T>): ScaleCodecTransaction<Data>
-    = append(unsignedPayload.module.indexUInt8, UInt8::class)
+internal fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.append(
+    unsignedPayload: UnsignedPayload<T>
+): ScaleCodecTransaction<Data> = apply { println("[payload] add module index") }
+    .append(unsignedPayload.module.indexUInt8, UInt8::class)
+    .apply { println("[payload] add call index") }
     .append(unsignedPayload.callVariant.indexUInt8, UInt8::class)
+    .apply { println("[payload] add call value") }
     .append(unsignedPayload.callValue, unsignedPayload.callValueClass)

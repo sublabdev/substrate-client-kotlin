@@ -26,8 +26,12 @@ class RpcRequestBuilder<P: Any, R: Any>(
 )
 
 class RpcClient(
-    private val url: String
+    private val host: String,
+    private val path: String? = null,
+    private val params: Map<String, Any?> = mapOf()
 ) {
+    // For testing purposes
+    internal companion object
 
     private val httpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
@@ -40,7 +44,12 @@ class RpcClient(
     suspend fun send(request: RpcRequest): RpcResponse = httpClient.post {
         url {
             protocol = URLProtocol.HTTPS
-            host = this@RpcClient.url
+            host = this@RpcClient.host
+            pathSegments = listOfNotNull(this@RpcClient.path)
+            for ((key, value) in params) {
+                parameter(key, value)
+            }
+            method = HttpMethod.Post
             contentType(ContentType.Application.Json)
             setBody(request)
         }
@@ -64,8 +73,12 @@ class RpcClient(
             params = params
         )
 
-        val rpcResponse = send(request)
-        println("builder: $params, request: $request")
+        val rpcResponse: RpcResponse
+        try {
+            rpcResponse = send(request)
+        } catch (error: Exception) {
+            throw error // debugging purpose line
+        }
 
         rpcResponse.error?.let {
             throw RpcResponseErrorException(it.message)

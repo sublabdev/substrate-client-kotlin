@@ -12,7 +12,7 @@ class Index(byteArray: ByteArray): FromByteArray(byteArray) {
 
     val value = BigInteger(byteArray.reversedArray())
     // Required to convert to and from actual type
-    override fun toByteArray(): ByteArray = value.toByteArray()
+    override fun toByteArray(): ByteArray = value.toByteArray().reversedArray()
 }
 
 /**
@@ -24,5 +24,5 @@ class Balance(byteArray: ByteArray): FromByteArray(byteArray) {
 
     val value = BigInteger(byteArray.reversedArray())
     // Required to convert to and from actual type
-    override fun toByteArray(): ByteArray = value.toByteArray()
+    override fun toByteArray(): ByteArray = value.toByteArray().reversedArray()
 }

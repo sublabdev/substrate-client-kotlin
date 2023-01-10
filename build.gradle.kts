@@ -12,6 +12,7 @@ version = "1.0.0"
 repositories {
     mavenLocal()
     mavenCentral()
+    maven { url = uri("https://repo.repsy.io/mvn/chrynan/public") } // Kotlin SecureRandom
 }
 
 val kotlinVersion: String by project

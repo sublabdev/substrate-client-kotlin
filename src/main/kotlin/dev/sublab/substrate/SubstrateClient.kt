@@ -19,16 +19,24 @@ typealias HexScaleCodec = ScaleCodec<String>
 class SubstrateClient(
     url: String,
     settings: SubstrateClientSettings = SubstrateClientSettings.default(),
-    private val codecProvider: ScaleCodecProvider = ScaleCodecProvider.default(),
+    internal val codecProvider: ScaleCodecProvider = ScaleCodecProvider.default(),
     private val hashers: HashersProvider = DefaultHashersProvider(),
-    private val moduleRpcProvider: InternalModuleRpcProvider = DefaultModuleRpcProvider(codecProvider, RpcClient(url), hashers),
+    private val moduleRpcProvider: InternalModuleRpcProvider = DefaultModuleRpcProvider(
+        codecProvider = codecProvider,
+        rpcClient = RpcClient(url, settings.rpcPath, settings.rpcParams),
+        hashersProvider = hashers
+    )
 ) {
+    // For testing purposes
+    internal companion object
 
     val modules: ModuleRpcProvider get() = moduleRpcProvider
 
-    private val webSocketClient = WebSocketClient(
+    val webSocket = WebSocketClient(
+        secure = settings.webSocketSecure,
         host = url,
         path = settings.webSocketPath,
+        params = settings.webSocketParams,
         port = settings.webSocketPort
     )
 
@@ -43,14 +51,27 @@ class SubstrateClient(
         return runtimeMetadata.filterNotNull()
     }
 
-    val lookup = SubstrateLookupService(getRuntime(), settings.namingPolicy)
-    val constants = SubstrateConstantsService(codecProvider.byteArray, lookup)
-    val storage = SubstrateStorageService(codecProvider.byteArray, lookup, modules.stateRpc())
-    val extrinsics = SubstrateExtrinsicsService(getRuntime(), codecProvider.byteArray, lookup, settings.namingPolicy)
+    val lookup: SubstrateLookupService
+    val constants: SubstrateConstantsService
+    val storage: SubstrateStorageService
+    val extrinsics: SubstrateExtrinsicsService
 
     init {
         // Supply dependencies
         moduleRpcProvider.workingWithClient(this)
         codecProvider.applyRuntimeMetadata(getRuntime())
+
+        // Init after dependencies set
+        lookup = SubstrateLookupService(getRuntime(), settings.namingPolicy)
+        constants = SubstrateConstantsService(codecProvider.byteArray, lookup)
+        storage = SubstrateStorageService(codecProvider.byteArray, lookup, modules.stateRpc())
+        extrinsics = SubstrateExtrinsicsService(
+            runtimeMetadata = getRuntime(),
+            systemRpc = modules.systemRpc(),
+            chainRpc = modules.chainRpc(),
+            codec = codecProvider.byteArray,
+            lookup = lookup,
+            namingPolicy = settings.namingPolicy
+        )
     }
 }
