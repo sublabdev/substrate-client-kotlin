@@ -6,6 +6,8 @@ import dev.sublab.substrate.SubstrateConstantsService
 import dev.sublab.substrate.hashers.HashersProvider
 import dev.sublab.substrate.modules.chain.ChainRpc
 import dev.sublab.substrate.modules.chain.ChainRpcClient
+import dev.sublab.substrate.modules.payment.PaymentRpc
+import dev.sublab.substrate.modules.payment.PaymentRpcClient
 import dev.sublab.substrate.modules.state.StateRpcClient
 import dev.sublab.substrate.modules.system.SystemRpc
 import dev.sublab.substrate.modules.system.SystemRpcClient
@@ -21,6 +23,7 @@ class DefaultModuleRpcProvider(
     override fun chainRpc() = ChainRpcClient(rpcClient)
     override fun stateRpc() = StateRpcClient(codecProvider.hex, rpcClient, hashersProvider)
     override fun systemRpc() = SystemRpcClient(client.constants, client.storage)
+    override fun paymentRpc() = PaymentRpcClient(codecProvider.hex, rpcClient)
 
     // Supply dependencies
     override fun workingWithClient(client: SubstrateClient) {

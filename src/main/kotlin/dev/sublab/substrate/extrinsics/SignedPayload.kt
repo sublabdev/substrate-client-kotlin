@@ -17,8 +17,6 @@ import dev.sublab.substrate.scale.Balance
 import dev.sublab.substrate.scale.Index
 import java.math.BigInteger
 
-internal typealias SignatureBlock = (ByteArray) -> ByteArray
-
 internal class SignedPayload<T: Any>(
     internal val runtimeMetadata: RuntimeMetadata,
     private val codec: ScaleCodec<ByteArray>,
@@ -36,20 +34,20 @@ internal class SignedPayload<T: Any>(
     override val callName: String get() = payload.callName
 
     private fun signingPayload() = codec.transaction()
-        .apply { println("[extrinsic-signing] add payload") }
+//        .apply { println("[extrinsic-signing] add payload") }
         .append(payload)
-        .apply { println("[extrinsic-signing] add extra") }
+//        .apply { println("[extrinsic-signing] add extra") }
 //        .append(extra(), ExtrinsicExtra::class)
         .appendExtra(this)
-        .apply { println("[extrinsic-signing] add additional") }
+//        .apply { println("[extrinsic-signing] add additional") }
         .appendAdditional(this)
         .commit()
 
     internal fun sign() = signingPayload().run {
-        println("signing payload: ${this.hex.encode(true)}, signature: ${
-            if (size > 256) signatureEngine.sign(hashing.blake2b_256())
-            else signatureEngine.sign(this)
-                .hex.encode(true)}")
+//        println("signing payload: ${this.hex.encode(true)}, signature: ${
+//            if (size > 256) signatureEngine.sign(hashing.blake2b_256())
+//            else signatureEngine.sign(this)
+//                .hex.encode(true)}")
         if (size > 256) signatureEngine.sign(hashing.blake2b_256())
         else signatureEngine.sign(this)
     }
@@ -68,22 +66,21 @@ internal class SignedPayload<T: Any>(
 //    override fun toByteArray() = codec.toScale(makeExtrinsic(), Extrinsic::class)
 
     private fun makeExtrinsic() = codec.transaction()
-        .apply { println("[extrinsic]") }
+//        .apply { println("[extrinsic]") }
         // "is signed" + transaction protocol version
-        .apply { println("[extrinsic] add prefix") }
+//        .apply { println("[extrinsic] add prefix") }
         .append((0b10000000.toUInt() + runtimeMetadata.extrinsic.version.toUInt()).toUByte(), UInt8::class)
         // from address for signature
-        .apply { println("[extrinsic] add account id") }
+//        .apply { println("[extrinsic] add account id") }
 //        .append(accountId, ByteArray::class)
         .appendAccountId(this)
-        .apply { println("[extrinsic] add signature") }
+//        .apply { println("[extrinsic] add signature") }
         .appendSignature(this)
 //        .append(sign().also { println("[signature] signature: ${it.hex.encode(true)}") }.asScaleEncoded(), ScaleEncodedByteArray::class)
-        .apply { println("[extrinsic] add extra") }
+//        .apply { println("[extrinsic] add extra") }
 //        .append(extra(), ExtrinsicExtra::class)
         .appendExtra(this)
-//        .appendAdditional(this)
-        .apply { println("[extrinsic] add payload") }
+//        .apply { println("[extrinsic] add payload") }
         .append(payload.toByteArray().asScaleEncoded(), ScaleEncodedByteArray::class) // Ignore size, inject directly
         .commit()
 
@@ -109,7 +106,7 @@ private fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.appendAccountId(sign
     val addressIdTypeIndex = addressVariants.firstOrNull { it.name == "Id" }?.indexUInt8
         ?: throw ExtrinsicBuildFailedDueToLookupFailureException()
 
-    println("[account-id] index: $addressIdTypeIndex")
+//    println("[account-id] index: $addressIdTypeIndex")
     append(addressIdTypeIndex, UInt8::class)
     // Ignore size, inject directly
     append(signedPayload.accountId.asScaleEncoded(), ScaleEncodedByteArray::class)
@@ -125,7 +122,7 @@ private fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.appendSignature(sign
         it.name.lowercase() == signedPayload.signatureEngine.name.lowercase()
     }?.indexUInt8 ?: throw ExtrinsicBuildFailedDueToLookupFailureException()
 
-    println("[signature] index: $signatureTypeIndex]")
+//    println("[signature] index: $signatureTypeIndex]")
     append(signatureTypeIndex, UInt8::class)
     append(signedPayload.sign().asScaleEncoded(), ScaleEncodedByteArray::class)
 }
@@ -133,9 +130,9 @@ private fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.appendSignature(sign
 private fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.appendExtra(signedPayload: SignedPayload<T>) = apply {
     for (extension in signedPayload.runtimeMetadata.extrinsic.signedExtensions) {
         when (extension.identifier) {
-            "CheckMortality" -> apply { println("[extra] add mortality: ${signedPayload.era}") }.append(signedPayload.era, Era::class)
-            "CheckNonce" -> apply { println("[extra] add nonce: ${signedPayload.nonce.value}") }.append(signedPayload.nonce.value, BigInteger::class)
-            "ChargeTransactionPayment" -> apply { println("[extra] add tip: ${signedPayload.tip.value}") }.append(signedPayload.tip.value, BigInteger::class)
+            "CheckMortality" -> append(signedPayload.era, Era::class)//.apply { println("[extra] add mortality: ${signedPayload.era}") }
+            "CheckNonce" -> append(signedPayload.nonce.value, BigInteger::class)//.apply { println("[extra] add nonce: ${signedPayload.nonce.value}") }
+            "ChargeTransactionPayment" -> append(signedPayload.tip.value, BigInteger::class)//.apply { println("[extra] add tip: ${signedPayload.tip.value}") }
         }
     }
 }
@@ -143,10 +140,10 @@ private fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.appendExtra(signedPa
 private fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.appendAdditional(signedPayload: SignedPayload<T>) = apply {
     for (extension in signedPayload.runtimeMetadata.extrinsic.signedExtensions) {
         when (extension.identifier) {
-            "CheckGenesis" -> apply { println("[add] add genesis hash: ${signedPayload.genesisHash}") }.append(signedPayload.genesisHash.hex.decode().asScaleEncoded(), ScaleEncodedByteArray::class)
-            "CheckMortality" -> apply { println("[add] add block hash: ${signedPayload.blockHash}") }.append(signedPayload.blockHash.hex.decode().asScaleEncoded(), ScaleEncodedByteArray::class)
-            "CheckSpecVersion" -> apply { println("[add] add spec version: ${signedPayload.runtimeVersion.specVersion.value}") }.append(signedPayload.runtimeVersion.specVersion, Index::class)
-            "CheckTxVersion" -> apply { println("[add] add tx version: ${signedPayload.runtimeVersion.txVersion.value}") }.append(signedPayload.runtimeVersion.txVersion, Index::class)
+            "CheckGenesis" -> append(signedPayload.genesisHash.hex.decode().asScaleEncoded(), ScaleEncodedByteArray::class)//.apply { println("[add] add genesis hash: ${signedPayload.genesisHash}") }
+            "CheckMortality" -> append(signedPayload.blockHash.hex.decode().asScaleEncoded(), ScaleEncodedByteArray::class)//.apply { println("[add] add block hash: ${signedPayload.blockHash}") }
+            "CheckSpecVersion" -> append(signedPayload.runtimeVersion.specVersion, Index::class)//.apply { println("[add] add spec version: ${signedPayload.runtimeVersion.specVersion.value}") }
+            "CheckTxVersion" -> append(signedPayload.runtimeVersion.txVersion, Index::class)//.apply { println("[add] add tx version: ${signedPayload.runtimeVersion.txVersion.value}") }
         }
     }
 }

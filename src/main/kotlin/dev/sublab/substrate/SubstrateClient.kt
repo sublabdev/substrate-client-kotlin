@@ -19,7 +19,7 @@ typealias HexScaleCodec = ScaleCodec<String>
 class SubstrateClient(
     url: String,
     settings: SubstrateClientSettings = SubstrateClientSettings.default(),
-    internal val codecProvider: ScaleCodecProvider = ScaleCodecProvider.default(),
+    private val codecProvider: ScaleCodecProvider = ScaleCodecProvider.default(),
     private val hashers: HashersProvider = DefaultHashersProvider(),
     private val moduleRpcProvider: InternalModuleRpcProvider = DefaultModuleRpcProvider(
         codecProvider = codecProvider,

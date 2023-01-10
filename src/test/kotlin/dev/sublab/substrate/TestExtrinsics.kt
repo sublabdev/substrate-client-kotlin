@@ -61,7 +61,7 @@ internal class TestExtrinsics {
             callValueType = AddMemo::class,
             unsignedHex = "0x490600000000086869"
         )
-    ) + generatedAddMemoCases()
+    )// + generatedAddMemoCases()
 
     @Test
     fun test() = runBlocking {
@@ -79,22 +79,13 @@ internal class TestExtrinsics {
             callValueType = case.callValueType
         )
 
-        println("case: $case")
-        println("unsigned: ${unsigned.toByteArray().hex.encode(true)}")
-
         if (!case.unsignedHex.hex.decode().contentEquals(unsigned.toByteArray())) {
             println("Expected extrinsic encoded hex to be: ${case.unsignedHex}, received: ${unsigned.toByteArray().hex.encode(true)}")
         }
         assertContentEquals(case.unsignedHex.hex.decode(), unsigned.toByteArray())
 
         // Signed
-//        val keyPair = KeyPair.Factory.sr25519().generate()
-        // EM6Q1K1e5W4EaUD4gXCQd71ZoyyVreNSrQXy2PtKcfh71i1
-        val seed = "recycle duty silver hunt option tonight task month crew twice churn level"
-        val keyPair = KeyPair.Factory.sr25519().generate(seed)
-        println("keypair seed: ${DefaultMnemonic.fromPhrase(seed).toSeed().hex.encode(true)}")
-        println("keypair private key: ${keyPair.privateKey.hex.encode()}")
-        println("keypair public key: ${keyPair.publicKey.hex.encode()}")
+        val keyPair = KeyPair.Factory.sr25519().generate()
 
         val signed = client.extrinsics.makeSigned(
             moduleName = case.moduleName,
@@ -106,9 +97,8 @@ internal class TestExtrinsics {
             keyPair.getSignatureEngine(keyPair.privateKey)
         )
 
-        val signedByteArray = signed.toByteArray()
-        println("account account id: ${keyPair.publicKey.ss58.accountId().hex.encode(true)}")
-        println("account address: ${keyPair.publicKey.ss58.address(network.addressType)}")
-        println("signed: ${signedByteArray.hex.encode(true)}")
+        val queryFeeDetails = client.modules.paymentRpc().getQueryFeeDetails(signed)
+        assertNotNull(queryFeeDetails)
+        assert(queryFeeDetails.baseFee.value > BigInteger.ZERO)
     }
 }

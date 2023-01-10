@@ -44,7 +44,7 @@ class SubstrateExtrinsicsService(
         ?.let { lookup.findRuntimeType(it) }.or(flowOf<RuntimeType?>(null))
         .map { runtimeType ->
             findCall(runtimeType?.def, callName)?.let {
-                println("call with '${module.name}_$callName' index: ${module.index}, ${it.index}")
+//                println("call with '${module.name}_$callName' index: ${module.index}, ${it.index}")
                 RuntimeCall(module, it)
             }
         }

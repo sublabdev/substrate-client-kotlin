@@ -25,9 +25,9 @@ internal class UnsignedPayload<T: Any>(
 
 internal fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.append(
     unsignedPayload: UnsignedPayload<T>
-): ScaleCodecTransaction<Data> = apply { println("[payload] add module index") }
-    .append(unsignedPayload.module.indexUInt8, UInt8::class)
-    .apply { println("[payload] add call index") }
+): ScaleCodecTransaction<Data> = /*apply { println("[payload] add module index") }
+    .*/append(unsignedPayload.module.indexUInt8, UInt8::class)
+//    .apply { println("[payload] add call index") }
     .append(unsignedPayload.callVariant.indexUInt8, UInt8::class)
-    .apply { println("[payload] add call value") }
+//    .apply { println("[payload] add call value") }
     .append(unsignedPayload.callValue, unsignedPayload.callValueClass)
