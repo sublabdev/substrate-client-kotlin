@@ -1,5 +1,8 @@
 package dev.sublab.substrate.metadata.lookup.type.def
 
+/**
+ * Primitive runtime type
+ */
 enum class RuntimeTypeDefPrimitive {
     Bool,
     Char,

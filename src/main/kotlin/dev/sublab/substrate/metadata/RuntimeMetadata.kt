@@ -4,6 +4,9 @@ import dev.sublab.common.numerics.*
 import dev.sublab.substrate.metadata.lookup.RuntimeLookup
 import dev.sublab.substrate.metadata.modules.RuntimeModule
 
+/**
+ * Runtime Metadata
+ */
 data class RuntimeMetadata(
     val magicNumber: UInt32,
     private val versionUInt8: UInt8,

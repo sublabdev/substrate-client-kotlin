@@ -13,6 +13,9 @@ import dev.sublab.substrate.modules.system.SystemRpc
 import dev.sublab.substrate.modules.system.SystemRpcClient
 import dev.sublab.substrate.rpcClient.RpcClient
 
+/**
+ * Default module rpc provider
+ */
 class DefaultModuleRpcProvider(
     private val codecProvider: ScaleCodecProvider,
     private val rpcClient: RpcClient,
@@ -26,6 +29,9 @@ class DefaultModuleRpcProvider(
     override fun paymentRpc() = PaymentRpcClient(codecProvider.hex, rpcClient)
 
     // Supply dependencies
+    /**
+     * Sets substrate client to be used
+     */
     override fun workingWithClient(client: SubstrateClient) {
         this.client = client
     }

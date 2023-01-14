@@ -4,6 +4,9 @@ import dev.sublab.scale.annotations.EnumCase
 import dev.sublab.scale.annotations.EnumClass
 import dev.sublab.substrate.metadata.lookup.type.def.*
 
+/**
+ * Runtime type definition
+ */
 @Suppress("unused")
 @EnumClass
 sealed class RuntimeTypeDef {

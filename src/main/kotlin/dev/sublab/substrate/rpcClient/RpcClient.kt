@@ -25,6 +25,9 @@ class RpcRequestBuilder<P: Any, R: Any>(
     var responseType: KClass<R>? = null
 )
 
+/**
+ * RPC client that handles sending requests
+ */
 class RpcClient(
     private val host: String,
     private val path: String? = null,
@@ -41,6 +44,9 @@ class RpcClient(
 
     private var requestCounter: Long = 0
 
+    /**
+     * Sends a ready `RpcRequest`
+     */
     suspend fun send(request: RpcRequest): RpcResponse = httpClient.post {
         url {
             protocol = URLProtocol.HTTPS
@@ -55,6 +61,9 @@ class RpcClient(
         }
     }.body()
 
+    /**
+     * Sending a request by creating `RpcRequest`
+     */
     suspend fun <P: Any, R: Any> sendRequest(block: RpcRequestBuilder<P, R>.() -> Unit): R? {
         val builder = RpcRequestBuilder<P, R>()
         block(builder)

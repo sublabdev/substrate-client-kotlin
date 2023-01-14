@@ -22,6 +22,9 @@ import kotlin.reflect.KClass
 
 private data class RuntimeCall(val module: RuntimeModule, val variant: RuntimeTypeDefVariant.Variant)
 
+/**
+ * Substrate extrinsics service
+ */
 class SubstrateExtrinsicsService(
     private val runtimeMetadata: Flow<RuntimeMetadata>,
     private val systemRpc: SystemRpc,
@@ -72,6 +75,9 @@ class SubstrateExtrinsicsService(
         callValueType: KClass<T>
     ): Payload = makePayload(moduleName, callName, callValue, callValueType)
 
+    /**
+     * Makes an unsigned payload
+     */
     suspend fun <T: Any> makeUnsigned(call: Call<T>) = makeUnsigned(
         moduleName = call.moduleName,
         callName = call.name,

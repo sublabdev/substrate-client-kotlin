@@ -8,11 +8,17 @@ import dev.sublab.substrate.metadata.modules.storage.item.RuntimeModuleStorageIt
 import kotlinx.coroutines.flow.*
 import java.math.BigInteger
 
+/**
+ * An object holding information about a module
+ */
 private data class ModulePath(
     val moduleName: String,
     val childName: String
 )
 
+/**
+ * Substrate lookup serivce
+ */
 class SubstrateLookupService(
     private val runtimeMetadata: Flow<RuntimeMetadata>,
     private val namingPolicy: SubstrateClientNamingPolicy
@@ -21,23 +27,38 @@ class SubstrateLookupService(
         SubstrateLookup(it, namingPolicy)
     }
 
+    /**
+     * Finds a runtime module for a provided name using the existing runtime metadata
+     */
     fun findModule(name: String) = lookupAsFlow().map {
         it.findModule(name)
     }
 
+    /**
+     * Finds constant with the provided name either in a runtime module after finding the module first
+     */
     fun findConstant(moduleName: String, constantName: String) = lookupAsFlow().map {
         it.findConstant(moduleName, constantName)
     }
 
+    /**
+     * Finds a storage item previously fetching the module
+     */
     fun findStorageItem(moduleName: String, itemName: String) = lookupAsFlow().map {
         it.findStorageItem(moduleName, itemName)
     }
 
+    /**
+     * Finds a runtime lookup item for a provided index
+     */
     fun findRuntimeType(index: BigInteger) = lookupAsFlow().map {
         it.findRuntimeType(index)
     }
 }
 
+/**
+ * v
+ */
 data class FindStorageItemResult(val item: RuntimeModuleStorageItem, val storage: RuntimeModuleStorage)
 
 private class SubstrateLookup(

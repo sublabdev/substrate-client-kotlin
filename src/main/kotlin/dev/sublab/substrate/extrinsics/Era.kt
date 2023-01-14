@@ -4,6 +4,9 @@ import dev.sublab.common.numerics.UInt64
 import dev.sublab.scale.annotations.EnumCase
 import dev.sublab.scale.annotations.EnumClass
 
+/**
+ * An extrinsic era
+ */
 @EnumClass
 sealed class Era {
     @EnumCase(index = 0)

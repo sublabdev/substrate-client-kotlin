@@ -16,6 +16,10 @@ import kotlinx.coroutines.flow.filterNotNull
 
 typealias HexScaleCodec = ScaleCodec<String>
 
+/**
+ * Substrate client which holds substrate lookup service; constants service and storage service.
+ * Is the entering point for using those services.
+ */
 class SubstrateClient(
     url: String,
     settings: SubstrateClientSettings = SubstrateClientSettings.default(),

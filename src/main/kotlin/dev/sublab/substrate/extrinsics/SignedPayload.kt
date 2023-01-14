@@ -17,6 +17,9 @@ import dev.sublab.substrate.scale.Balance
 import dev.sublab.substrate.scale.Index
 import java.math.BigInteger
 
+/**
+ * A signed payload. Subclass of Payload
+ */
 internal class SignedPayload<T: Any>(
     internal val runtimeMetadata: RuntimeMetadata,
     private val codec: ScaleCodec<ByteArray>,

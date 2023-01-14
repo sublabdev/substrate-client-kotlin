@@ -5,6 +5,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 
+/**
+ * RPC request with generic params
+ */
 @Serializable
 data class RpcRequest constructor(
     @EncodeDefault val jsonrpc: String = rpcVersion,

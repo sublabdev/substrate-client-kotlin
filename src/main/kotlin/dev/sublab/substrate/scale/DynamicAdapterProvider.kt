@@ -16,12 +16,25 @@ import kotlin.reflect.KType
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.findAnnotation
 
+/**
+ * An interface for providing a scale codec adapter as well as methods for decoding and encoding
+ */
 internal class Adapter<T>(
     val scaleAdapter: ScaleCodecAdapter<T>,
+    /**
+     * Converts value to ByteArray
+     */
     val toByteArray: ((T) -> ByteArray)? = null,
+
+    /**
+     * Converts provided data into `Any`
+     */
     val fromByteArray: ((ByteArray) -> T)? = null
 )
 
+/**
+ * A dynamic adapter provider that provides an adapter based on the provided dynamic type
+ */
 internal class DynamicAdapterProvider(
     private val adapterResolver: ScaleCodecAdapterProvider,
     private val runtimeMetadata: Flow<RuntimeMetadata>
@@ -56,6 +69,9 @@ internal class DynamicAdapterProvider(
         } as Adapter<T>
     }
 
+    /**
+     * Finds an adapter based on the provided runtime primitive
+     */
     private fun findAdapter(primitive: RuntimeTypeDefPrimitive, type: KType): Adapter<*> = when (primitive) {
         Bool -> Adapter(BooleanAdapter())
         RuntimeTypeDefPrimitive.Char -> throw UnsupportedDynamicTypeException(type)

@@ -6,6 +6,9 @@ import dev.sublab.substrate.scale.Balance
 import kotlinx.serialization.Serializable
 import java.math.BigInteger
 
+/**
+ * Contains details of query fee
+ */
 data class QueryFeeDetails(
     val baseFee: Balance,
     val lenFee: Balance,
@@ -23,6 +26,10 @@ internal data class QueryFeeDetailsResponse(
         val adjustedWeightFee: String
     )
 
+    /**
+     * Creates a query fee details from inclusion fee
+     * @return Generated query fee details
+     */
     fun toFinal() = QueryFeeDetails(
         baseFee = Balance(inclusionFee.baseFee.hex.toBigInteger()),
         lenFee = Balance(inclusionFee.lenFee.hex.toBigInteger()),

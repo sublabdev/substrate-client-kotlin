@@ -7,6 +7,9 @@ import dev.sublab.substrate.metadata.lookup.type.def.RuntimeTypeDefVariant
 import dev.sublab.substrate.metadata.modules.RuntimeModule
 import kotlin.reflect.KClass
 
+/**
+ * An unsigned payload. Subclass of Payload
+ */
 internal class UnsignedPayload<T: Any>(
     private val codec: ScaleCodec<ByteArray>,
     internal val module: RuntimeModule,

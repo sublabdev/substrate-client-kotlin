@@ -11,12 +11,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 
+/**
+ * Web socket client subscription policy. Can be: "NONE"; "FIRST_SUBSCRIBER"; and "ALL_SUBSCRIBERS"
+ */
 enum class WebSocketClientSubscriptionPolicy {
     NONE,
     FIRST_SUBSCRIBER,
     ALL_SUBSCRIBERS
 }
 
+/**
+ * Web socket client
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 class WebSocketClient(
     secure: Boolean = false,
@@ -100,6 +106,9 @@ class WebSocketClient(
 
     suspend fun send(message: String) = output.send(message)
 
+    /**
+     * Subscribes for updates upon recieving messages
+     */
     fun subscribe(): Flow<String> = input.apply {
         when (policy) {
             WebSocketClientSubscriptionPolicy.FIRST_SUBSCRIBER -> {

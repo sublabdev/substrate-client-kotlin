@@ -1,5 +1,8 @@
 package dev.sublab.substrate
 
+/**
+ * Naming police for substrate client
+ */
 enum class SubstrateClientNamingPolicy {
     NONE,
     CASE_INSENSITIVE;

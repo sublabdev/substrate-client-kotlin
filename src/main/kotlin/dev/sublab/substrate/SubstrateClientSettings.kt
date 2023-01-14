@@ -3,6 +3,9 @@ package dev.sublab.substrate
 import dev.sublab.substrate.storage.InMemoryObjectStorageFactory
 import dev.sublab.substrate.storage.ObjectStorageFactory
 
+/**
+ * Substrate client settings
+ */
 data class SubstrateClientSettings(
     val rpcPath: String?,
     val rpcParams: Map<String, Any?>,
@@ -15,6 +18,9 @@ data class SubstrateClientSettings(
     val objectStorageFactory: ObjectStorageFactory
 ) {
     companion object {
+        /**
+         * The default settings for substrate client
+         */
         fun default() = SubstrateClientSettings(
             rpcPath = null,
             rpcParams = mapOf(),

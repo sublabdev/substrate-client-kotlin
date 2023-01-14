@@ -4,6 +4,9 @@ import dev.sublab.common.numerics.UInt8
 import dev.sublab.scale.annotations.FixedArray
 import dev.sublab.substrate.scale.Index
 
+/**
+ *  Runtime version
+ */
 data class RuntimeVersion(
     val specName: String,
     val implName: String,

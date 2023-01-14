@@ -8,10 +8,22 @@ import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorageHasher
 import dev.sublab.substrate.metadata.modules.storage.item.RuntimeModuleStorageItem
 import dev.sublab.substrate.metadata.modules.storage.item.type.RuntimeModuleStorageItemType
 
+/**
+ * Interface for providing a hashing functionality
+ */
 interface StorageHashing {
+    /**
+     * Hashes provided storage item. The hashing can be either plain or key-map
+     * @param storageItem a storage item to hash
+     * @param keys keys for hashing by key-mapping
+     * @return A hashed `ByteArray`
+     */
     fun hash(storageItem: RuntimeModuleStorageItem, keys: List<ByteArrayConvertible> = listOf()): ByteArray
 }
 
+/**
+ * Handles storage hashing
+ */
 class StorageHasher(
     private val storage: RuntimeModuleStorage
 ): StorageHashing {

@@ -10,15 +10,34 @@ import dev.sublab.substrate.metadata.modules.storage.item.RuntimeModuleStorageIt
 import dev.sublab.substrate.rpcClient.RpcClient
 import kotlin.reflect.KClass
 
+/**
+ * Interface for getting Runtime metadata and fetching Storage Items
+ */
 interface StateRpc {
+    /**
+     * Gets runtime metadata
+     */
     suspend fun getRuntimeMetadata(): RuntimeMetadata?
 
+    /**
+     * Fetches storage item
+     * @param item an item to be hashed to get a key which can be used as `RpcRequest`'s parameters
+     * @param storage storage for which a storage hasher is created, which hashes the item
+     * @return  A storage item
+     */
     suspend fun <T: Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
         storage: RuntimeModuleStorage,
         type: KClass<T>
     ): T?
 
+    /**
+     * Fetches storage item
+     * @param item an item to be hashed to get a key which can be used as `RpcRequest`'s parameters
+     * @param key A key to be used when hashing in a storage hasher.
+     * @param storage storage for which a storage hasher is created, which hashes the item
+     * @return  A storage item
+     */
     suspend fun <T: Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
         key: ByteArrayConvertible,
@@ -26,6 +45,13 @@ interface StateRpc {
         type: KClass<T>
     ): T?
 
+    /**
+     * Fetches storage item
+     * @param item an item to be hashed to get a key which can be used as `RpcRequest`'s parameters
+     * @param keys Keys to be used when hashing in a storage hasher.
+     * @param storage storage for which a storage hasher is created, which hashes the item
+     * @return  A storage item
+     */
     suspend fun <T: Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
         keys: List<ByteArrayConvertible>,
@@ -34,6 +60,9 @@ interface StateRpc {
     ): T?
 }
 
+/**
+ * State RPC client which handles fetching storage item and runtime metadata
+ */
 class StateRpcClient(
     private val codec: HexScaleCodec,
     private val rpcClient: RpcClient,
@@ -46,6 +75,9 @@ class StateRpcClient(
         codec.fromScale(it, RuntimeMetadata::class)
     }
 
+    /**
+     * Fetches a storage item using its key
+     */
     private suspend fun <T: Any> fetchStorageItem(
         key: ByteArray,
         type: KClass<T>
@@ -58,12 +90,18 @@ class StateRpcClient(
         codec.fromScale(it, type)
     }
 
+    /**
+     * Fetches a storage item
+     */
     override suspend fun <T : Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
         storage: RuntimeModuleStorage,
         type: KClass<T>
     ) = fetchStorageItem(hashersProvider.getStorageHasher(storage).hash(item), type)
 
+    /**
+     * Fetches a storage item
+     */
     override suspend fun <T : Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
         key: ByteArrayConvertible,
@@ -71,6 +109,9 @@ class StateRpcClient(
         type: KClass<T>
     ) = fetchStorageItem(hashersProvider.getStorageHasher(storage).hash(item, listOf(key)), type)
 
+    /**
+     * Fetches a storage item
+     */
     override suspend fun <T : Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
         keys: List<ByteArrayConvertible>,

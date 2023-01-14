@@ -14,9 +14,15 @@ import kotlin.reflect.typeOf
 
 internal class DynamicAdapterGivenInvalidType(type: KType): Throwable()
 
+/**
+ * An adapter that decodes data dynamically. A subclass of `ScaleCodecAdapter`
+ */
 internal class DynamicAdapter<T>(
     private val provider: DynamicAdapterProvider
 ): ScaleCodecAdapter<T>() {
+    /**
+     * Decodes ByteArray dynamically to a specified generic type `T`
+     */
     override fun read(reader: ByteArrayReader, type: KType, annotations: List<Annotation>): T = runBlocking {
         val adapter = provider.findAdapter<T>(type)
         return@runBlocking adapter.toByteArray
@@ -40,6 +46,9 @@ internal class DynamicAdapter<T>(
             ?: adapter.scaleAdapter.read(reader, type)
     }
 
+    /**
+     * Encodes provided value to `Data`
+     */
     override fun write(obj: T, type: KType, annotations: List<Annotation>) = runBlocking {
         if (obj !is FromByteArray) throw DynamicAdapterGivenInvalidType(type)
 

@@ -3,6 +3,9 @@ package dev.sublab.substrate.modules.system.storage
 import dev.sublab.substrate.scale.Balance
 import dev.sublab.substrate.scale.Index
 
+/**
+ * Account information
+ */
 data class Account(
     val nonce: Index,
     val consumers: Index,

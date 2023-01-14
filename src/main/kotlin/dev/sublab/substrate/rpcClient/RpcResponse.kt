@@ -3,6 +3,9 @@ package dev.sublab.substrate.rpcClient
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
+/**
+ * RPC response
+ */
 @Serializable
 data class RpcResponse(
     val jsonrpc: String,
