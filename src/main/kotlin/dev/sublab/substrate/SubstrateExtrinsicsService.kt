@@ -31,6 +31,7 @@ class SubstrateExtrinsicsService(
     private val chainRpc: ChainRpc,
     private val codec: ScaleCodec<ByteArray>,
     private val lookup: SubstrateLookupService,
+    private val storage: SubstrateStorageService,
     private val namingPolicy: SubstrateClientNamingPolicy
 ) {
 
@@ -100,7 +101,29 @@ class SubstrateExtrinsicsService(
         runtimeVersion = systemRpc.runtimeVersion() ?: throw RuntimeVersionNotKnownException(),
         genesisHash = chainRpc.getBlockHash(0) ?: throw GenesisHashNotKnownException(),
         accountId = accountId,
-        nonce = Index(BigInteger.valueOf(1)), // TODO: Provide nonce
+        nonce = systemRpc.accountByAccountId(accountId)?.nonce ?: throw NonceNotKnownException(),
+        tip = tip,
+        signatureEngine = signatureEngine
+    )
+
+    // Tests for empty account
+    internal suspend fun <T: Any> makeSigned(
+        moduleName: String,
+        callName: String,
+        callValue: T,
+        callValueType: KClass<T>,
+        tip: Balance,
+        accountId: AccountId,
+        nonce: Index,
+        signatureEngine: SignatureEngine
+    ): Payload = SignedPayload(
+        runtimeMetadata = runtimeMetadata.first(),
+        codec = codec,
+        payload = makePayload(moduleName, callName, callValue, callValueType),
+        runtimeVersion = systemRpc.runtimeVersion() ?: throw RuntimeVersionNotKnownException(),
+        genesisHash = chainRpc.getBlockHash(0) ?: throw GenesisHashNotKnownException(),
+        accountId = accountId,
+        nonce = nonce,
         tip = tip,
         signatureEngine = signatureEngine
     )

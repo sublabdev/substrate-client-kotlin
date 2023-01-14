@@ -1,18 +1,13 @@
 package dev.sublab.substrate.scale
 
 import dev.sublab.common.FromByteArray
-import dev.sublab.hex.hex
 import dev.sublab.scale.ByteArrayReader
 import dev.sublab.scale.ScaleCodecAdapter
 import dev.sublab.scale.adapters.InvalidTypeException
 import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
-import kotlin.reflect.full.createType
 import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.typeOf
-
-internal class DynamicAdapterGivenInvalidType(type: KType): Throwable()
 
 /**
  * An adapter that decodes data dynamically. A subclass of `ScaleCodecAdapter`

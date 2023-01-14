@@ -4,7 +4,6 @@ import dev.sublab.hex.hex
 import dev.sublab.substrate.HexScaleCodec
 import dev.sublab.substrate.scale.Balance
 import kotlinx.serialization.Serializable
-import java.math.BigInteger
 
 /**
  * Contains details of query fee

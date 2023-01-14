@@ -117,7 +117,6 @@ private fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.appendAccountId(sign
 
 private fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.appendSignature(signedPayload: SignedPayload<T>) = apply {
     val signaturesTypeDef = signedPayload.runtimeMetadata.findSignatureTypeDef("Signature")
-
     val signatureVariants = (signaturesTypeDef as? RuntimeTypeDef.Variant)?.variant?.variants
         ?: throw ExtrinsicBuildFailedDueToLookupFailureException()
 
@@ -127,6 +126,7 @@ private fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.appendSignature(sign
 
 //    println("[signature] index: $signatureTypeIndex]")
     append(signatureTypeIndex, UInt8::class)
+    // Ignore size, inject directly
     append(signedPayload.sign().asScaleEncoded(), ScaleEncodedByteArray::class)
 }
 

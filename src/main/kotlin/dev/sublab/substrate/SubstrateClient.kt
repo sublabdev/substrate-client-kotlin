@@ -75,6 +75,7 @@ class SubstrateClient(
             chainRpc = modules.chainRpc(),
             codec = codecProvider.byteArray,
             lookup = lookup,
+            storage = storage,
             namingPolicy = settings.namingPolicy
         )
     }

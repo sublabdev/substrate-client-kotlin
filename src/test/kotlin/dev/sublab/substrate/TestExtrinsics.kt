@@ -93,9 +93,12 @@ internal class TestExtrinsics {
             callValue = case.callValue,
             callValueType = case.callValueType,
             tip = Balance(BigInteger("0")),
-            keyPair.publicKey.ss58.accountId(),
-            keyPair.getSignatureEngine(keyPair.privateKey)
+            accountId = keyPair.publicKey.ss58.accountId(),
+            nonce = Index(BigInteger("0")),
+            signatureEngine = keyPair.getSignatureEngine(keyPair.privateKey)
         )
+
+        println("network: ${network}, signed: ${signed.toByteArray().hex.encode(true)}")
 
         val queryFeeDetails = client.modules.paymentRpc().getQueryFeeDetails(signed)
         assertNotNull(queryFeeDetails)

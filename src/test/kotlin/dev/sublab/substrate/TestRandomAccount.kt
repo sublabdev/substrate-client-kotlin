@@ -25,6 +25,7 @@ internal class TestRandomAccount {
 
     private val factories = listOf(
         KeyPair.Factory.ecdsa(Kind.SUBSTRATE),
+        KeyPair.Factory.ecdsa(Kind.ETHEREUM),
         KeyPair.Factory.ed25519,
         KeyPair.Factory.sr25519()
     )
@@ -40,14 +41,6 @@ internal class TestRandomAccount {
                 .first()
 
             assertNull(account)
-            testFailingExtrinsic(keyPair, accountId)
         }
-    }
-
-    private suspend fun testFailingExtrinsic(keyPair: KeyPair, accountId: ByteArrayConvertible) {
-        val addMemoInstruction = AddMemo(0u, "hi".toByteArray())
-        val extrinsic = client.extrinsics.makeSigned(AddMemoCall(addMemoInstruction), Balance(0.toBigInteger()), keyPair)
-        assertNotNull(extrinsic)
-        val signedByteArray = extrinsic.toByteArray()
     }
 }

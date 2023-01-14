@@ -2,7 +2,8 @@ package dev.sublab.substrate.scale
 
 import kotlin.reflect.KType
 
-class TypeIsNotDynamicException(type: KType): Throwable()
-class TypeIsNotFoundInRuntimeMetadataException(type: KType): Throwable()
-class UnsupportedDynamicTypeException(type: KType): Throwable()
-class NoByteArrayConstructorException(type: KType): Throwable()
+internal class DynamicAdapterGivenInvalidType(type: KType): Throwable()
+internal class TypeIsNotDynamicException(type: KType): Throwable()
+internal class TypeIsNotFoundInRuntimeMetadataException(type: KType): Throwable()
+internal class UnsupportedDynamicTypeException(type: KType): Throwable()
+internal class NoByteArrayConstructorException(type: KType): Throwable()
