@@ -23,13 +23,19 @@ import dev.sublab.substrate.metadata.modules.RuntimeModuleConstant
 import kotlinx.coroutines.flow.*
 import kotlin.reflect.KClass
 
+interface SubstrateConstants {
+    fun find(moduleName: String, constantName: String): Flow<RuntimeModuleConstant?>
+    fun <T: Any> fetch(moduleName: String, constantName: String, type: KClass<T>): Flow<T?>
+    fun <T: Any> fetch(constant: RuntimeModuleConstant, type: KClass<T>): T?
+}
+
 /**
  * Substrate constants service. Handles fetching runtime module constant
  */
-class SubstrateConstantsService(
+internal class SubstrateConstantsService(
     private val codec: ScaleCodec<ByteArray>,
-    private val lookup: SubstrateLookupService
-) {
+    private val lookup: SubstrateLookup
+): SubstrateConstants {
 
     /**
      * Finds a runtime module constant by the constant's name in a specified module
@@ -37,8 +43,8 @@ class SubstrateConstantsService(
      * @param constantName constant name by which the constant should be found
      * @return a cruntime module constant
      */
-    fun find(moduleName: String, constantName: String) = lookup.findConstant(moduleName, constantName)
-    fun <T: Any> fetch(moduleName: String, constantName: String, type: KClass<T>) = find(moduleName, constantName)
+    override fun find(moduleName: String, constantName: String) = lookup.findConstant(moduleName, constantName)
+    override fun <T: Any> fetch(moduleName: String, constantName: String, type: KClass<T>) = find(moduleName, constantName)
         .map {
             it?.let { fetch(it, type) }
         }
@@ -46,6 +52,6 @@ class SubstrateConstantsService(
     /**
      * Decodes the value bytes of a runtime module constant into a specified type
      */
-    fun <T: Any> fetch(constant: RuntimeModuleConstant, type: KClass<T>)
+    override fun <T: Any> fetch(constant: RuntimeModuleConstant, type: KClass<T>)
         = codec.fromScale(constant.value, type)
 }

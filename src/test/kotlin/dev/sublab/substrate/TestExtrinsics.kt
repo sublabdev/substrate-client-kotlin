@@ -87,8 +87,14 @@ internal class TestExtrinsics {
     }
 
     private suspend fun <T: Any> testCase(case: ExtrinsicTestCase<T>) {
+        // Access internal methods for test
+        val service = (client.extrinsics as? SubstrateExtrinsicsService) ?: run {
+            assert(false)
+            return
+        }
+
         // Unsigned
-        val unsigned = client.extrinsics.makeUnsigned(
+        val unsigned = service.makeUnsigned(
             moduleName = case.moduleName,
             callName = case.callName,
             callValue = case.callValue,
@@ -103,7 +109,7 @@ internal class TestExtrinsics {
         // Signed
         val keyPair = KeyPair.Factory.sr25519().generate()
 
-        val signed = client.extrinsics.makeSigned(
+        val signed = service.makeSigned(
             moduleName = case.moduleName,
             callName = case.callName,
             callValue = case.callValue,
@@ -116,7 +122,7 @@ internal class TestExtrinsics {
 
         println("network: ${network}, signed: ${signed.toByteArray().hex.encode(true)}")
 
-        val queryFeeDetails = client.modules.payment().getQueryFeeDetails(signed)
+        val queryFeeDetails = client.modules.payment.getQueryFeeDetails(signed)
         assertNotNull(queryFeeDetails)
         assert(queryFeeDetails.baseFee.value > BigInteger.ZERO)
     }

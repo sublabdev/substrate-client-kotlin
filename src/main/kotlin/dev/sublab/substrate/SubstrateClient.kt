@@ -27,6 +27,7 @@ import dev.sublab.substrate.modules.InternalModuleProvider
 import dev.sublab.substrate.modules.ModuleProvider
 import dev.sublab.substrate.rpcClient.RpcClient
 import dev.sublab.substrate.utils.JobWithTimeout
+import dev.sublab.substrate.webSocketClient.WebSocket
 import dev.sublab.substrate.webSocketClient.WebSocketClient
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,7 +46,7 @@ class SubstrateClient(
     private val hashers: HashersProvider = DefaultHashersProvider(),
     private val moduleProvider: InternalModuleProvider = DefaultModuleProvider(
         codecProvider = codecProvider,
-        rpcClient = RpcClient(url, settings.rpcPath, settings.rpcParams),
+        rpc = RpcClient(url, settings.rpcPath, settings.rpcParams),
         hashersProvider = hashers
     )
 ) {
@@ -54,7 +55,7 @@ class SubstrateClient(
 
     val modules: ModuleProvider get() = moduleProvider
 
-    val webSocket = WebSocketClient(
+    val webSocket: WebSocket = WebSocketClient(
         secure = settings.webSocketSecure,
         host = url,
         path = settings.webSocketPath,
@@ -67,16 +68,16 @@ class SubstrateClient(
         runtimeMetadata.value = loadRuntime()
     }
 
-    private suspend fun loadRuntime() = modules.state().getRuntimeMetadata()
+    private suspend fun loadRuntime() = modules.state.getRuntimeMetadata()
     internal fun getRuntime(): Flow<RuntimeMetadata> {
         runtimeMetadataUpdate.perform()
         return runtimeMetadata.filterNotNull()
     }
 
-    val lookup: SubstrateLookupService
-    val constants: SubstrateConstantsService
-    val storage: SubstrateStorageService
-    val extrinsics: SubstrateExtrinsicsService
+    val lookup: SubstrateLookup
+    val constants: SubstrateConstants
+    val storage: SubstrateStorage
+    val extrinsics: SubstrateExtrinsics
 
     init {
         // Supply dependencies
@@ -86,14 +87,13 @@ class SubstrateClient(
         // Init after dependencies set
         lookup = SubstrateLookupService(getRuntime(), settings.namingPolicy)
         constants = SubstrateConstantsService(codecProvider.byteArray, lookup)
-        storage = SubstrateStorageService(codecProvider.byteArray, lookup, modules.state())
+        storage = SubstrateStorageService(codecProvider.byteArray, lookup, modules.state)
         extrinsics = SubstrateExtrinsicsService(
             runtimeMetadata = getRuntime(),
-            systemRpc = modules.system(),
-            chainRpc = modules.chain(),
+            systemRpc = modules.system,
+            chainRpc = modules.chain,
             codec = codecProvider.byteArray,
             lookup = lookup,
-            storage = storage,
             namingPolicy = settings.namingPolicy
         )
     }

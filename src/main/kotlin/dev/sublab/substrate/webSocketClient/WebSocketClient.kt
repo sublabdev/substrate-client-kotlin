@@ -38,18 +38,24 @@ enum class WebSocketClientSubscriptionPolicy {
     ALL_SUBSCRIBERS
 }
 
+interface WebSocket {
+    suspend fun send(message: String)
+    fun subscribe(): Flow<String>
+    fun subscribeToErrors(): Flow<Throwable>
+}
+
 /**
  * Web socket client
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class WebSocketClient(
+internal class WebSocketClient(
     secure: Boolean = false,
     host: String,
     path: String? = null,
     params: Map<String, Any?> = mapOf(),
     port: Int? = null,
     private val policy: WebSocketClientSubscriptionPolicy = WebSocketClientSubscriptionPolicy.NONE
-) {
+): WebSocket {
 
     private val clientScope = CoroutineScope(Job())
 
@@ -122,12 +128,12 @@ class WebSocketClient(
         }
     }
 
-    suspend fun send(message: String) = output.send(message)
+    override suspend fun send(message: String) = output.send(message)
 
     /**
      * Subscribes for updates upon recieving messages
      */
-    fun subscribe(): Flow<String> = input.apply {
+    override fun subscribe(): Flow<String> = input.apply {
         when (policy) {
             WebSocketClientSubscriptionPolicy.FIRST_SUBSCRIBER -> {
                 if (!hadSubscriptions) {
@@ -147,5 +153,5 @@ class WebSocketClient(
         }
     }
 
-    fun subscribeToErrors() = error.receiveAsFlow()
+    override fun subscribeToErrors() = error.receiveAsFlow()
 }

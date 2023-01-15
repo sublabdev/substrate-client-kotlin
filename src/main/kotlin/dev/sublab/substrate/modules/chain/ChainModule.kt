@@ -20,7 +20,7 @@ package dev.sublab.substrate.modules.chain
 
 import dev.sublab.common.numerics.toByteArray
 import dev.sublab.hex.hex
-import dev.sublab.substrate.rpcClient.RpcClient
+import dev.sublab.substrate.rpcClient.Rpc
 
 /**
  * An interface for chain RPC client
@@ -36,9 +36,9 @@ interface ChainModule {
  * Handles chain block hash fetching
  */
 class ChainModuleClient(
-    private val rpcClient: RpcClient
+    private val rpc: Rpc
     ): ChainModule {
-    override suspend fun getBlockHash(number: Int) = rpcClient.sendRequest<String, String> {
+    override suspend fun getBlockHash(number: Int) = rpc.sendRequest<String, String> {
         method = "chain_getBlockHash"
         responseType = String::class
         params = listOf(number.toUInt().toByteArray().hex.encode())

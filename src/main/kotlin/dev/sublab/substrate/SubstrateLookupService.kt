@@ -19,6 +19,7 @@
 package dev.sublab.substrate
 
 import dev.sublab.substrate.metadata.RuntimeMetadata
+import dev.sublab.substrate.metadata.lookup.RuntimeType
 import dev.sublab.substrate.metadata.modules.RuntimeModule
 import dev.sublab.substrate.metadata.modules.RuntimeModuleConstant
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage
@@ -34,42 +35,49 @@ private data class ModulePath(
     val childName: String
 )
 
+interface SubstrateLookup {
+    fun findModule(name: String): Flow<RuntimeModule?>
+    fun findConstant(moduleName: String, constantName: String): Flow<RuntimeModuleConstant?>
+    fun findStorageItem(moduleName: String, itemName: String): Flow<FindStorageItemResult?>
+    fun findRuntimeType(index: BigInteger): Flow<RuntimeType?>
+}
+
 /**
- * Substrate lookup serivce
+ * Substrate lookup service
  */
-class SubstrateLookupService(
+internal class SubstrateLookupService(
     private val runtimeMetadata: Flow<RuntimeMetadata>,
     private val namingPolicy: SubstrateClientNamingPolicy
-) {
+): SubstrateLookup {
     private fun lookupAsFlow() = runtimeMetadata.map {
-        SubstrateLookup(it, namingPolicy)
+        SubstrateLookupServiceImplementation(it, namingPolicy)
     }
 
     /**
      * Finds a runtime module for a provided name using the existing runtime metadata
      */
-    fun findModule(name: String) = lookupAsFlow().map {
+    override fun findModule(name: String) = lookupAsFlow().map {
         it.findModule(name)
     }
 
     /**
      * Finds constant with the provided name either in a runtime module after finding the module first
      */
-    fun findConstant(moduleName: String, constantName: String) = lookupAsFlow().map {
+    override fun findConstant(moduleName: String, constantName: String) = lookupAsFlow().map {
         it.findConstant(moduleName, constantName)
     }
 
     /**
      * Finds a storage item previously fetching the module
      */
-    fun findStorageItem(moduleName: String, itemName: String) = lookupAsFlow().map {
+    override fun findStorageItem(moduleName: String, itemName: String) = lookupAsFlow().map {
         it.findStorageItem(moduleName, itemName)
     }
 
     /**
      * Finds a runtime lookup item for a provided index
      */
-    fun findRuntimeType(index: BigInteger) = lookupAsFlow().map {
+    override fun findRuntimeType(index: BigInteger) = lookupAsFlow().map {
         it.findRuntimeType(index)
     }
 }
@@ -79,7 +87,7 @@ class SubstrateLookupService(
  */
 data class FindStorageItemResult(val item: RuntimeModuleStorageItem, val storage: RuntimeModuleStorage)
 
-private class SubstrateLookup(
+private class SubstrateLookupServiceImplementation(
     private val runtimeMetadata: RuntimeMetadata,
     private val namingPolicy: SubstrateClientNamingPolicy
 ) {

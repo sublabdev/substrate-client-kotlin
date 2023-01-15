@@ -25,7 +25,7 @@ import dev.sublab.substrate.hashers.HashersProvider
 import dev.sublab.substrate.metadata.RuntimeMetadata
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage
 import dev.sublab.substrate.metadata.modules.storage.item.RuntimeModuleStorageItem
-import dev.sublab.substrate.rpcClient.RpcClient
+import dev.sublab.substrate.rpcClient.Rpc
 import kotlin.reflect.KClass
 
 /**
@@ -83,10 +83,10 @@ interface StateModule {
  */
 class StateModuleClient(
     private val codec: HexScaleCodec,
-    private val rpcClient: RpcClient,
+    private val rpc: Rpc,
     private val hashersProvider: HashersProvider
 ): StateModule {
-    override suspend fun getRuntimeMetadata() = rpcClient.sendRequest<Unit, String> {
+    override suspend fun getRuntimeMetadata() = rpc.sendRequest<Unit, String> {
         method = "state_getMetadata"
         responseType = String::class
     }?.let {
@@ -99,7 +99,7 @@ class StateModuleClient(
     private suspend fun <T: Any> fetchStorageItem(
         key: ByteArray,
         type: KClass<T>
-    ) = rpcClient.sendRequest<String, String> {
+    ) = rpc.sendRequest<String, String> {
         method = "state_getStorage"
         responseType = String::class
         paramsType = String::class

@@ -35,20 +35,20 @@ interface ModuleProvider {
     /**
      * Provides an interface for getting chain `RPC` client
      */
-    fun chain(): ChainModule
+    val chain: ChainModule
 
     /**
     * Provides an interface for getting payment `RPC` client
     */
-    fun payment(): PaymentModule
+    val payment: PaymentModule
 
     /**
      * Provides an interface for getting `RuntimeMetadata` and fetching `StorageItems`
      */
-    fun state(): StateModule
+    val state: StateModule
 
     /**
      * Provides an interface for getting `RuntimeVersion`
      */
-    fun system(): SystemModule
+    val system: SystemModule
 }

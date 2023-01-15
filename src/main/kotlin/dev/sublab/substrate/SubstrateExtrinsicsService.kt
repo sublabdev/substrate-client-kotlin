@@ -39,18 +39,32 @@ import kotlin.reflect.KClass
 
 private data class RuntimeCall(val module: RuntimeModule, val variant: RuntimeTypeDefVariant.Variant)
 
+interface SubstrateExtrinsics {
+    suspend fun <T: Any> makeUnsigned(call: Call<T>): Payload
+    suspend fun <T: Any> makeSigned(
+        call: Call<T>,
+        tip: Balance,
+        accountId: AccountId,
+        signatureEngine: SignatureEngine
+    ): Payload?
+    suspend fun <T: Any> makeSigned(
+        call: Call<T>,
+        tip: Balance,
+        keyPair: KeyPair
+    ): Payload?
+}
+
 /**
  * Substrate extrinsics service
  */
-class SubstrateExtrinsicsService(
+internal class SubstrateExtrinsicsService(
     private val runtimeMetadata: Flow<RuntimeMetadata>,
     private val systemRpc: SystemModule,
     private val chainRpc: ChainModule,
     private val codec: ScaleCodec<ByteArray>,
-    private val lookup: SubstrateLookupService,
-    private val storage: SubstrateStorageService,
+    private val lookup: SubstrateLookup,
     private val namingPolicy: SubstrateClientNamingPolicy
-) {
+): SubstrateExtrinsics {
 
     private fun findCall(variant: RuntimeTypeDefVariant, callName: String) = variant.variants.firstOrNull {
         namingPolicy.equals(callName, it.name)
@@ -96,7 +110,7 @@ class SubstrateExtrinsicsService(
     /**
      * Makes an unsigned payload
      */
-    suspend fun <T: Any> makeUnsigned(call: Call<T>) = makeUnsigned(
+    override suspend fun <T: Any> makeUnsigned(call: Call<T>) = makeUnsigned(
         moduleName = call.moduleName,
         callName = call.name,
         callValue = call.value,
@@ -145,7 +159,7 @@ class SubstrateExtrinsicsService(
         signatureEngine = signatureEngine
     )
 
-    suspend fun <T: Any> makeSigned(
+    override suspend fun <T: Any> makeSigned(
         call: Call<T>,
         tip: Balance,
         accountId: AccountId,
@@ -160,7 +174,7 @@ class SubstrateExtrinsicsService(
         signatureEngine = signatureEngine
     )
 
-    suspend fun <T: Any> makeSigned(
+    override suspend fun <T: Any> makeSigned(
         call: Call<T>,
         tip: Balance,
         keyPair: KeyPair

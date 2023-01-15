@@ -70,7 +70,13 @@ class TestFetchingStorage {
 
     @Test
     internal fun testService() {
-        val service = SubstrateStorageService(ScaleCodec.default(), client.lookup, client.modules.state())
+        // Unwrap to internal type for tests
+        val lookup = (client.lookup as? SubstrateLookupService) ?: run {
+            assert(false)
+            return
+        }
+
+        val service = SubstrateStorageService(ScaleCodec.default(), lookup, client.modules.state)
         for (item in items) {
             testStorageItem(service, item)
         }
@@ -83,7 +89,7 @@ class TestFetchingStorage {
         }
     }
 
-    private fun <T: Any> testStorageItem(service: SubstrateStorageService, item: RpcStorageItem<T>) = runBlocking {
+    private fun <T: Any> testStorageItem(service: SubstrateStorage, item: RpcStorageItem<T>) = runBlocking {
         run {
             val storageItem = service.fetch(item.module, item.item, item.keys, item.type).first()
             item.validation?.let { isValid ->

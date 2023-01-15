@@ -23,17 +23,37 @@ import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage
 import dev.sublab.substrate.metadata.modules.storage.item.RuntimeModuleStorageItem
 import dev.sublab.substrate.modules.state.StateModule
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KClass
+
+interface SubstrateStorage {
+    fun find(moduleName: String, itemName: String): Flow<FindStorageItemResult?>
+    fun <T: Any> fetch(moduleName: String, itemName: String, type: KClass<T>): Flow<T?>
+    fun <T: Any> fetch(moduleName: String, itemName: String, key: ByteArrayConvertible, type: KClass<T>): Flow<T?>
+    fun <T: Any> fetch(moduleName: String, itemName: String, keys: List<ByteArrayConvertible>, type: KClass<T>): Flow<T?>
+    suspend fun <T: Any> fetch(item: RuntimeModuleStorageItem, storage: RuntimeModuleStorage, type: KClass<T>): T?
+    suspend fun <T: Any> fetch(
+        item: RuntimeModuleStorageItem,
+        key: ByteArrayConvertible,
+        storage: RuntimeModuleStorage,
+        type: KClass<T>
+    ): T?
+    suspend fun <T: Any> fetch(
+        item: RuntimeModuleStorageItem,
+        keys: List<ByteArrayConvertible>,
+        storage: RuntimeModuleStorage, type: KClass<T>
+    ): T?
+}
 
 /**
  * Substrate storage service
  */
-class SubstrateStorageService(
+internal class SubstrateStorageService(
     private val codec: ScaleCodec<ByteArray>,
     private val lookup: SubstrateLookupService,
     private val stateRpc: StateModule
-) {
+): SubstrateStorage {
 
     /**
      * Finds a storage item result, which is a wrapper over runtime module storage item and runtime module storage itself
@@ -42,7 +62,7 @@ class SubstrateStorageService(
      * @param itemName storage item's name
      * @return A storage item result from a module
      */
-    fun find(moduleName: String, itemName: String) = lookup.findStorageItem(moduleName, itemName)
+    override fun find(moduleName: String, itemName: String) = lookup.findStorageItem(moduleName, itemName)
 
     /**
      * Returns a storage item after getting a module first
@@ -51,31 +71,31 @@ class SubstrateStorageService(
      * @param type a generic type T for a result
      *
      */
-    fun <T: Any> fetch(moduleName: String, itemName: String, type: KClass<T>) = find(moduleName, itemName)
+    override fun <T: Any> fetch(moduleName: String, itemName: String, type: KClass<T>) = find(moduleName, itemName)
         .map { result ->
             result?.let { fetch(it.item, it.storage, type) }
         }
 
     /**
      * Fetches a storage item after getting a module first
-     * @param module's name to fetch
+     * @param moduleName module's name to fetch
      * @param itemName storage item's name
      * @param key a key to use for fetching a storage item
      * @param type a generic type T for a result
      */
-    fun <T: Any> fetch(moduleName: String, itemName: String, key: ByteArrayConvertible, type: KClass<T>)
+    override fun <T: Any> fetch(moduleName: String, itemName: String, key: ByteArrayConvertible, type: KClass<T>)
         = find(moduleName, itemName).map { result ->
             result?.let { fetch(it.item, key, it.storage, type) }
         }
 
     /**
      * Fetches a storage item after getting a module first
-     * @param module's name to fetch
+     * @param moduleName module's name to fetch
      * @param itemName storage item's name
      * @param keys keys to use for fetching a storage item
      * @param type a generic type T for a result
      */
-    fun <T: Any> fetch(moduleName: String, itemName: String, keys: List<ByteArrayConvertible>, type: KClass<T>)
+    override fun <T: Any> fetch(moduleName: String, itemName: String, keys: List<ByteArrayConvertible>, type: KClass<T>)
         = find(moduleName, itemName).map { result ->
             result?.let { fetch(it.item, keys, it.storage, type) }
         }
@@ -85,7 +105,7 @@ class SubstrateStorageService(
      * @param item an item to be hashed
      * @param storage a storage for which a storage hasher is created, which hashes the item
      */
-    suspend fun <T: Any> fetch(item: RuntimeModuleStorageItem, storage: RuntimeModuleStorage, type: KClass<T>)
+    override suspend fun <T: Any> fetch(item: RuntimeModuleStorageItem, storage: RuntimeModuleStorage, type: KClass<T>)
         = stateRpc.fetchStorageItem(item, storage, type)
 
     /**
@@ -94,7 +114,7 @@ class SubstrateStorageService(
      * @param key a key to be used when hashing in a storage hasher
      * @param storage storage for which a storage hasher is created, which hashes the item
      */
-    suspend fun <T: Any> fetch(
+    override suspend fun <T: Any> fetch(
         item: RuntimeModuleStorageItem,
         key: ByteArrayConvertible,
         storage: RuntimeModuleStorage,
@@ -107,7 +127,7 @@ class SubstrateStorageService(
      * @param keys key to be used when hashing in a storage hasher
      * @param storage storage for which a storage hasher is created, which hashes the item
      */
-    suspend fun <T: Any> fetch(
+    override suspend fun <T: Any> fetch(
         item: RuntimeModuleStorageItem,
         keys: List<ByteArrayConvertible>,
         storage: RuntimeModuleStorage, type: KClass<T>

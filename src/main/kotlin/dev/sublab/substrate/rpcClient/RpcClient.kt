@@ -43,14 +43,19 @@ class RpcRequestBuilder<P: Any, R: Any>(
     var responseType: KClass<R>? = null
 )
 
+interface Rpc {
+    suspend fun send(request: RpcRequest): RpcResponse
+    suspend fun <P: Any, R: Any> sendRequest(block: RpcRequestBuilder<P, R>.() -> Unit): R?
+}
+
 /**
  * RPC client that handles sending requests
  */
-class RpcClient(
+internal class RpcClient(
     private val host: String,
     private val path: String? = null,
     private val params: Map<String, Any?> = mapOf()
-) {
+): Rpc {
     // For testing purposes
     internal companion object
 
@@ -65,7 +70,7 @@ class RpcClient(
     /**
      * Sends a ready `RpcRequest`
      */
-    suspend fun send(request: RpcRequest): RpcResponse = httpClient.post {
+    override suspend fun send(request: RpcRequest): RpcResponse = httpClient.post {
         url {
             protocol = URLProtocol.HTTPS
             host = this@RpcClient.host
@@ -82,7 +87,7 @@ class RpcClient(
     /**
      * Sending a request by creating `RpcRequest`
      */
-    suspend fun <P: Any, R: Any> sendRequest(block: RpcRequestBuilder<P, R>.() -> Unit): R? {
+    override suspend fun <P: Any, R: Any> sendRequest(block: RpcRequestBuilder<P, R>.() -> Unit): R? {
         val builder = RpcRequestBuilder<P, R>()
         block(builder)
 

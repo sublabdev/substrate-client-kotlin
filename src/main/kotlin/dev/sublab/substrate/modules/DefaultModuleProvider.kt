@@ -18,29 +18,34 @@
 
 package dev.sublab.substrate.modules
 
+import com.sun.net.httpserver.Filter.Chain
 import dev.sublab.substrate.ScaleCodecProvider
 import dev.sublab.substrate.SubstrateClient
 import dev.sublab.substrate.hashers.HashersProvider
+import dev.sublab.substrate.modules.chain.ChainModule
 import dev.sublab.substrate.modules.chain.ChainModuleClient
+import dev.sublab.substrate.modules.payment.PaymentModule
 import dev.sublab.substrate.modules.payment.PaymentModuleClient
+import dev.sublab.substrate.modules.state.StateModule
 import dev.sublab.substrate.modules.state.StateModuleClient
+import dev.sublab.substrate.modules.system.SystemModule
 import dev.sublab.substrate.modules.system.SystemModuleClient
-import dev.sublab.substrate.rpcClient.RpcClient
+import dev.sublab.substrate.rpcClient.Rpc
 
 /**
  * Default module rpc provider
  */
 class DefaultModuleProvider(
     private val codecProvider: ScaleCodecProvider,
-    private val rpcClient: RpcClient,
+    private val rpc: Rpc,
     private val hashersProvider: HashersProvider
 ): InternalModuleProvider {
     lateinit var client: SubstrateClient
 
-    override fun chain() = ChainModuleClient(rpcClient)
-    override fun state() = StateModuleClient(codecProvider.hex, rpcClient, hashersProvider)
-    override fun system() = SystemModuleClient(client.constants, client.storage)
-    override fun payment() = PaymentModuleClient(codecProvider.hex, rpcClient)
+    override val chain: ChainModule get() = ChainModuleClient(rpc)
+    override val state: StateModule get() = StateModuleClient(codecProvider.hex, rpc, hashersProvider)
+    override val system: SystemModule get() = SystemModuleClient(client.constants, client.storage)
+    override val payment: PaymentModule get() = PaymentModuleClient(codecProvider.hex, rpc)
 
     // Supply dependencies
     /**

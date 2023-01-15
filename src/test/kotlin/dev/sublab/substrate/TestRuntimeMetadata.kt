@@ -83,7 +83,7 @@ internal class TestRuntimeMetadata {
     fun testRuntimeVersion() = runBlocking {
         for (network in allNetworks()) {
             val client = network.makeClient()
-            val runtimeVersion = client.modules.system().runtimeVersion()
+            val runtimeVersion = client.modules.system.runtimeVersion()
             assertNotNull(runtimeVersion)
         }
     }
@@ -92,7 +92,7 @@ internal class TestRuntimeMetadata {
     fun testGenesisHash() = runBlocking {
         for (network in allNetworks()) {
             val client = network.makeClient()
-            val genesisHash = client.modules.chain().getBlockHash(0)
+            val genesisHash = client.modules.chain.getBlockHash(0)
             assertNotNull(genesisHash)
             assertEquals(network.genesisHash, genesisHash)
         }

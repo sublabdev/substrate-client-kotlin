@@ -23,7 +23,7 @@ import dev.sublab.substrate.HexScaleCodec
 import dev.sublab.substrate.extrinsics.Payload
 import dev.sublab.substrate.modules.payment.types.QueryFeeDetails
 import dev.sublab.substrate.modules.payment.types.QueryFeeDetailsResponse
-import dev.sublab.substrate.rpcClient.RpcClient
+import dev.sublab.substrate.rpcClient.Rpc
 
 /**
  * An interface for getting a query fee details response
@@ -42,9 +42,9 @@ interface PaymentModule {
  */
 class PaymentModuleClient(
     private val codec: HexScaleCodec,
-    private val rpcClient: RpcClient
+    private val rpc: Rpc
 ): PaymentModule {
-    override suspend fun getQueryFeeDetails(payload: Payload) = rpcClient.sendRequest<String, QueryFeeDetailsResponse> {
+    override suspend fun getQueryFeeDetails(payload: Payload) = rpc.sendRequest<String, QueryFeeDetailsResponse> {
         method = "payment_queryFeeDetails"
         responseType = QueryFeeDetailsResponse::class
         params = listOf(payload.toByteArray().hex.encode(true))

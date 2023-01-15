@@ -24,8 +24,8 @@ import dev.sublab.encrypting.keys.KeyPair
 import dev.sublab.hex.hex
 import dev.sublab.ss58.AccountId
 import dev.sublab.ss58.ss58
-import dev.sublab.substrate.SubstrateConstantsService
-import dev.sublab.substrate.SubstrateStorageService
+import dev.sublab.substrate.SubstrateConstants
+import dev.sublab.substrate.SubstrateStorage
 import dev.sublab.substrate.modules.system.constants.RuntimeVersion
 import dev.sublab.substrate.modules.system.storage.Account
 import kotlinx.coroutines.flow.first
@@ -41,8 +41,8 @@ interface SystemModule {
 }
 
 class SystemModuleClient(
-    private val constants: SubstrateConstantsService,
-    private val storage: SubstrateStorageService
+    private val constants: SubstrateConstants,
+    private val storage: SubstrateStorage
 ): SystemModule {
     override suspend fun runtimeVersion() = constants
         .fetch("system", "version", RuntimeVersion::class).first()
