@@ -21,6 +21,9 @@ package dev.sublab.substrate.metadata.modules
 import dev.sublab.common.numerics.Int8
 import java.math.BigInteger
 
+/**
+ * A runtime module constant object
+ */
 data class RuntimeModuleConstant(
     val name: String,
     val type: BigInteger,

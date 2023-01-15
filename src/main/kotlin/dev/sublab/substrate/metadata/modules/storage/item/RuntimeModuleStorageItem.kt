@@ -21,6 +21,9 @@ package dev.sublab.substrate.metadata.modules.storage.item
 import dev.sublab.common.numerics.Int8
 import dev.sublab.substrate.metadata.modules.storage.item.type.RuntimeModuleStorageItemType
 
+/**
+ * A runtime module storage item
+ */
 data class RuntimeModuleStorageItem(
     val name: String,
     val modifier: RuntimeModuleStorageItemModifier,

@@ -34,7 +34,7 @@ interface StorageHashing {
      * Hashes provided storage item. The hashing can be either plain or key-map
      * @param storageItem a storage item to hash
      * @param keys keys for hashing by key-mapping
-     * @return A hashed `ByteArray`
+     * @return A hashed [ByteArray]
      */
     fun hash(storageItem: RuntimeModuleStorageItem, keys: List<ByteArrayConvertible> = listOf()): ByteArray
 }

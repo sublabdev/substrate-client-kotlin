@@ -57,9 +57,15 @@ internal class DynamicAdapterProvider(
     private val adapterResolver: ScaleCodecAdapterProvider,
     private val runtimeMetadata: Flow<RuntimeMetadata>
 ) {
+    /**
+     * Finds an adapter for the provided generic type [T]
+     */
     @Suppress("unused")
     suspend fun <T: Any> findAdapter(type: KClass<T>) = findAdapter<T>(type.createType())
 
+    /**
+     * Finds an adapter for the provided generic type [T]
+     */
     @Suppress("UNCHECKED_CAST")
     suspend fun <T> findAdapter(type: KType): Adapter<T> {
         // Find annotation
@@ -89,6 +95,8 @@ internal class DynamicAdapterProvider(
 
     /**
      * Finds an adapter based on the provided runtime primitive
+     * @param primitive a primitive used to find an adapter
+     * @return Returns an [Adapter] object from the provided primitive
      */
     private fun findAdapter(primitive: RuntimeTypeDefPrimitive, type: KType): Adapter<*> = when (primitive) {
         Bool -> Adapter(BooleanAdapter())

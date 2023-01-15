@@ -35,6 +35,10 @@ internal class DynamicAdapter<T>(
 ): ScaleCodecAdapter<T>() {
     /**
      * Decodes ByteArray dynamically to a specified generic type `T`
+     * @param reader a [ByteArray] reader object
+     * @param type a generic type [T] to return
+     * @param annotations a list of annotations
+     * @return Returns a generic type [T] after reading the provided [ByteArray]
      */
     override fun read(reader: ByteArrayReader, type: KType, annotations: List<Annotation>): T = runBlocking {
         val adapter = provider.findAdapter<T>(type)
@@ -60,7 +64,9 @@ internal class DynamicAdapter<T>(
     }
 
     /**
-     * Encodes provided value to `Data`
+     * Encodes provided value to [Data]
+     * @param obj a generic object to write to [Data]
+     * @param annotations a list of annotations
      */
     override fun write(obj: T, type: KType, annotations: List<Annotation>) = runBlocking {
         if (obj !is FromByteArray) throw DynamicAdapterGivenInvalidType(type)

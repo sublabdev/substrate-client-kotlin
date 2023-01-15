@@ -36,6 +36,11 @@ internal const val rpcVersion = "2.0"
 
 open class RpcResponseErrorException(override val message: String): Throwable()
 
+/**
+ * An RPC request builder which takes
+ * @param P a generic parameter for a list of parameters
+ * @param R a generic parameter for a response
+ */
 class RpcRequestBuilder<P: Any, R: Any>(
     var method: String = "",
     var paramsType: KClass<P>? = null,
@@ -63,7 +68,9 @@ class RpcClient(
     private var requestCounter: Long = 0
 
     /**
-     * Sends a ready `RpcRequest`
+     * Gets a RPC response by sending a ready `RpcRequest`
+     * @param request [RpcRequest] to be sent
+     * @return Returns [RpcResponse]
      */
     suspend fun send(request: RpcRequest): RpcResponse = httpClient.post {
         url {
@@ -80,7 +87,9 @@ class RpcClient(
     }.body()
 
     /**
-     * Sending a request by creating `RpcRequest`
+     * Gets a RPC response by creating a `RpcRequest`
+     * @param block a block of code which creates an [RpcRequest] useing [RpcRequestBuilder]
+     * @return Returns [RpcResponse]
      */
     suspend fun <P: Any, R: Any> sendRequest(block: RpcRequestBuilder<P, R>.() -> Unit): R? {
         val builder = RpcRequestBuilder<P, R>()

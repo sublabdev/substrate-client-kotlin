@@ -22,6 +22,9 @@ import dev.sublab.common.numerics.*
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage
 import java.math.BigInteger
 
+/**
+ * A runtime module object
+ */
 data class RuntimeModule(
     val name: String,
     val storage: RuntimeModuleStorage?,

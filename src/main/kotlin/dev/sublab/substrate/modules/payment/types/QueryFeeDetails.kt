@@ -32,10 +32,16 @@ data class QueryFeeDetails(
     val adjustedWeightFee: Balance
 )
 
+/**
+ * Query fee details response
+ */
 @Serializable
 internal data class QueryFeeDetailsResponse(
     val inclusionFee: InclusionFee
 ) {
+    /**
+     * Inclusion fee object
+     */
     @Serializable
     data class InclusionFee(
         val baseFee: String,

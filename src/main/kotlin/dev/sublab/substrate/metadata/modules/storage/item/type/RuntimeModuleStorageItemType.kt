@@ -21,6 +21,9 @@ package dev.sublab.substrate.metadata.modules.storage.item.type
 import dev.sublab.scale.annotations.EnumCase
 import dev.sublab.scale.annotations.EnumClass
 
+/**
+ * A runtime module storage item type
+ */
 @EnumClass
 sealed class RuntimeModuleStorageItemType {
     @EnumCase(0) data class Plain(val value: RuntimeModuleStorageItemTypePlain): RuntimeModuleStorageItemType()

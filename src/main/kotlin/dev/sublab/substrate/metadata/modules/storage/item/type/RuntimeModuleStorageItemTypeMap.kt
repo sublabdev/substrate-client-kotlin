@@ -21,6 +21,9 @@ package dev.sublab.substrate.metadata.modules.storage.item.type
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorageHasher
 import java.math.BigInteger
 
+/**
+ * A map runtime module storage item type
+ */
 data class RuntimeModuleStorageItemTypeMap(
     val hashers: List<RuntimeModuleStorageHasher>,
     val key: BigInteger,

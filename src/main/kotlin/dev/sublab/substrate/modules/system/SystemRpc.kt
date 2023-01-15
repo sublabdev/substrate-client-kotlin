@@ -31,13 +31,55 @@ import dev.sublab.substrate.modules.system.storage.Account
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
+/**
+ * An interface for system RPC
+ */
 interface SystemRpc {
+    /**
+     * Returns an nullable runtime version
+     */
     suspend fun runtimeVersion(): RuntimeVersion?
+
+    /**
+     * Returns [Account] by its id as [ByteArrayConvertible]
+     * @param accountId An account id as [ByteArrayConvertible], used to find an account
+     * @return A nullable [Account] based on its id
+     */
     suspend fun accountByAccountId(accountId: ByteArrayConvertible): Account?
+
+    /**
+     * Returns [Account] by its id
+     * @param accountId An account id, used to find an account
+     * @return A nullable [Account] based on its id
+     */
     suspend fun accountByAccountId(accountId: AccountId): Account?
+
+    /**
+     * Returns [Account] by its id hex
+     * @param accountIdHex An account id hex, used to find an account
+     * @return A nullable [Account] based on its id hex
+     */
     suspend fun accountByAccountId(accountIdHex: String): Account?
+
+    /**
+     * Returns [Account] by public key
+     * @param publicKey a public key, used to find an account
+     * @return A nullable [Account] based on a public key
+     */
     suspend fun accountByPublicKey(publicKey: ByteArray): Account?
+
+    /**
+     * Returns [Account] by public key hex
+     * @param publicKeyHex a public key hex, used to find an account
+     * @return A nullable [Account] based on a public key hex
+     */
     suspend fun accountByPublicKey(publicKeyHex: String): Account?
+
+    /**
+     * Returns [Account] by key pair of public and private keys
+     * @param keyPair a key pair of ublic and private keys, used to find an account
+     * @return A nullable [Account] based on a key pair
+     */
     suspend fun accountByKeyPair(keyPair: KeyPair): Account?
 }
 

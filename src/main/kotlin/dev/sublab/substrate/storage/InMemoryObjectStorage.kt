@@ -21,8 +21,11 @@ package dev.sublab.substrate.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
- * In memory object storage facotry
+ * In memory object storage factory
  */
 class InMemoryObjectStorageFactory: ObjectStorageFactory {
+    /**
+     * Makes a mutable state flow with a generic nullable type [T]
+     */
     override fun <T> make() = MutableStateFlow<T?>(null)
 }

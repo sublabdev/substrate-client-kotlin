@@ -33,7 +33,7 @@ import kotlin.reflect.KClass
  */
 interface StateRpc {
     /**
-     * Gets runtime metadata
+     * Returns runtime metadata
      */
     suspend fun getRuntimeMetadata(): RuntimeMetadata?
 
@@ -95,6 +95,9 @@ class StateRpcClient(
 
     /**
      * Fetches a storage item using its key
+     * @param key a key used in a parameters when fetching a storage item
+     * @param type a generic type [T]
+     * @return A storage item
      */
     private suspend fun <T: Any> fetchStorageItem(
         key: ByteArray,
@@ -110,6 +113,10 @@ class StateRpcClient(
 
     /**
      * Fetches a storage item
+     * @param item a runtime module storage item
+     * @param storage a runtime module storage
+     * @param type a generic type [T]
+     * @return A storage item
      */
     override suspend fun <T : Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
@@ -119,6 +126,11 @@ class StateRpcClient(
 
     /**
      * Fetches a storage item
+     * @param item a runtime module storage item
+     * @param key a [ByteArrayConvertible] used while hashing
+     * @param storage a runtime module storage
+     * @param type a generic type [T]
+     * @return A storage item
      */
     override suspend fun <T : Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,
@@ -129,6 +141,11 @@ class StateRpcClient(
 
     /**
      * Fetches a storage item
+     * @param item a runtime module storage item
+     * @param keys a list of [ByteArrayConvertible] used while hashing
+     * @param storage a runtime module storage
+     * @param type a generic type [T]
+     * @return A storage item
      */
     override suspend fun <T : Any> fetchStorageItem(
         item: RuntimeModuleStorageItem,

@@ -36,6 +36,8 @@ private data class ModulePath(
 
 /**
  * Substrate lookup serivce
+ * @property runtimeMetadata a flow of runtime metadata which gets updated over time
+ * @property namingPolicy a naming policy for lookup
  */
 class SubstrateLookupService(
     private val runtimeMetadata: Flow<RuntimeMetadata>,
@@ -47,13 +49,18 @@ class SubstrateLookupService(
 
     /**
      * Finds a runtime module for a provided name using the existing runtime metadata
+     * @param name a name used to find a module
+     * @return A module found by its name
      */
     fun findModule(name: String) = lookupAsFlow().map {
         it.findModule(name)
     }
 
     /**
-     * Finds constant with the provided name either in a runtime module after finding the module first
+     * Finds constant with the provided name either in a runtime module  or after finding the module first
+     * @param moduleName a module name used to find a constant
+     * @param constantName to find a constant in an already found module
+     * @return A runtime costnat found by its name
      */
     fun findConstant(moduleName: String, constantName: String) = lookupAsFlow().map {
         it.findConstant(moduleName, constantName)
@@ -61,13 +68,17 @@ class SubstrateLookupService(
 
     /**
      * Finds a storage item previously fetching the module
+     * @param  moduleName a module name used to find a storage item
+     * @param itemName a specific item' name
+     * @return A storage item
      */
     fun findStorageItem(moduleName: String, itemName: String) = lookupAsFlow().map {
         it.findStorageItem(moduleName, itemName)
     }
 
     /**
-     * Finds a runtime lookup item for a provided index
+     * Finds a runtime lookup type for a provided index
+     * @param index an index to find a specific runtime type
      */
     fun findRuntimeType(index: BigInteger) = lookupAsFlow().map {
         it.findRuntimeType(index)

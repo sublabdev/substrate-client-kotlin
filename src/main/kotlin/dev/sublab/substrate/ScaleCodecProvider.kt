@@ -25,6 +25,9 @@ import dev.sublab.substrate.scale.DynamicAdapter
 import dev.sublab.substrate.scale.DynamicAdapterProvider
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * An object that provides a scale coded
+ */
 data class ScaleCodecProvider(
     val byteArray: ScaleCodec<ByteArray>,
     val hex: ScaleCodec<String>

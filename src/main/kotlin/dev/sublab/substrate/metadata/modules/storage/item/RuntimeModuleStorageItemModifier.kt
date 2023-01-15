@@ -18,6 +18,9 @@
 
 package dev.sublab.substrate.metadata.modules.storage.item
 
+/**
+ * A runtime module storage item modifier
+ */
 @Suppress("unused")
 enum class RuntimeModuleStorageItemModifier {
     Optional,

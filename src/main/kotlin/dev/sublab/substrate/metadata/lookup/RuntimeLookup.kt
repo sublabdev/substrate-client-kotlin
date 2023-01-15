@@ -22,6 +22,7 @@ import java.math.BigInteger
 
 /**
  * Runtime lookup. Holds an array of lookup items
+ * @property items a list of [RuntimeLookupItem]
  */
 data class RuntimeLookup(
     private val items: List<RuntimeLookupItem>

@@ -20,6 +20,9 @@ package dev.sublab.substrate.metadata.modules.storage
 
 import dev.sublab.scale.annotations.EnumClass
 
+/**
+ * A runtime module storage hasher
+ */
 @Suppress("unused")
 @EnumClass
 enum class RuntimeModuleStorageHasher {

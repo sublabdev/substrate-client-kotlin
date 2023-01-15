@@ -20,6 +20,9 @@ package dev.sublab.substrate.metadata.modules.storage.item.type
 
 import java.math.BigInteger
 
+/**
+ * A plain runtime module storage item type
+ */
 data class RuntimeModuleStorageItemTypePlain(
     val type: BigInteger
 )

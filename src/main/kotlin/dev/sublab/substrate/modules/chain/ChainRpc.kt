@@ -27,7 +27,9 @@ import dev.sublab.substrate.rpcClient.RpcClient
  */
 interface ChainRpc {
     /**
-     * Gets block hash using the provided number as a parameter for `RPC` request
+     * Gets block hash using the provided number as a parameter for [RPC] request
+     * @param number number used as a parameter for an [RPC] request to get a block hash
+     * @return Returns a block hash
      */
     suspend fun getBlockHash(number: Int): String?
 }

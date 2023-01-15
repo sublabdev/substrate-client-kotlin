@@ -20,6 +20,9 @@ package dev.sublab.substrate.metadata.modules.storage
 
 import dev.sublab.substrate.metadata.modules.storage.item.RuntimeModuleStorageItem
 
+/**
+ * A runtime module storage object
+ */
 data class RuntimeModuleStorage(
     val prefix: String,
     val items: List<RuntimeModuleStorageItem>

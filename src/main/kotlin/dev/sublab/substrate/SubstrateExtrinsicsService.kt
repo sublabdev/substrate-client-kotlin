@@ -95,7 +95,8 @@ class SubstrateExtrinsicsService(
     ): Payload = makePayload(moduleName, callName, callValue, callValueType)
 
     /**
-     * Makes an unsigned payload
+     * Makes an unsigned payload from a call
+     * @param call a call used to make an unsigned payload
      */
     suspend fun <T: Any> makeUnsigned(call: Call<T>) = makeUnsigned(
         moduleName = call.moduleName,
@@ -146,6 +147,14 @@ class SubstrateExtrinsicsService(
         signatureEngine = signatureEngine
     )
 
+    /**
+     * Makes a signed payload
+     * @param call a call with a generic type [T]
+     * @param tip a balance representation, used in transfers
+     * @param accountId an account id
+     * @param signatureEngine a signature engine
+     * @return Returns a signed payload
+     */
     suspend fun <T: Any> makeSigned(
         call: Call<T>,
         tip: Balance,
@@ -161,6 +170,13 @@ class SubstrateExtrinsicsService(
         signatureEngine = signatureEngine
     )
 
+    /**
+     * Makes a signed payload
+     * @param call a call with a generic type [T]
+     * @param tip a balance representation, used in transfers
+     * @param keyPair a [KeyPair] of public and private keys
+     * @return Returns a signed payload
+     */
     suspend fun <T: Any> makeSigned(
         call: Call<T>,
         tip: Balance,
