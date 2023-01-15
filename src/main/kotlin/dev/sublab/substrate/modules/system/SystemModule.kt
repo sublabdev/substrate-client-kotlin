@@ -28,10 +28,9 @@ import dev.sublab.substrate.SubstrateConstantsService
 import dev.sublab.substrate.SubstrateStorageService
 import dev.sublab.substrate.modules.system.constants.RuntimeVersion
 import dev.sublab.substrate.modules.system.storage.Account
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 
-interface SystemRpc {
+interface SystemModule {
     suspend fun runtimeVersion(): RuntimeVersion?
     suspend fun accountByAccountId(accountId: ByteArrayConvertible): Account?
     suspend fun accountByAccountId(accountId: AccountId): Account?
@@ -41,10 +40,10 @@ interface SystemRpc {
     suspend fun accountByKeyPair(keyPair: KeyPair): Account?
 }
 
-class SystemRpcClient(
+class SystemModuleClient(
     private val constants: SubstrateConstantsService,
     private val storage: SubstrateStorageService
-): SystemRpc {
+): SystemModule {
     override suspend fun runtimeVersion() = constants
         .fetch("system", "version", RuntimeVersion::class).first()
 

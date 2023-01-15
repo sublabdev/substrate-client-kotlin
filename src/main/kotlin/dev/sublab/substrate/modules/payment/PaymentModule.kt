@@ -28,7 +28,7 @@ import dev.sublab.substrate.rpcClient.RpcClient
 /**
  * An interface for getting a query fee details response
  */
-interface PaymentRpc {
+interface PaymentModule {
     /**
      * Gets query fee details for a payload
      * @param payload a payload for which query fee details should be fetched
@@ -40,10 +40,10 @@ interface PaymentRpc {
 /**
  * Handles payment query fee details fetching
  */
-class PaymentRpcClient(
+class PaymentModuleClient(
     private val codec: HexScaleCodec,
     private val rpcClient: RpcClient
-): PaymentRpc {
+): PaymentModule {
     override suspend fun getQueryFeeDetails(payload: Payload) = rpcClient.sendRequest<String, QueryFeeDetailsResponse> {
         method = "payment_queryFeeDetails"
         responseType = QueryFeeDetailsResponse::class

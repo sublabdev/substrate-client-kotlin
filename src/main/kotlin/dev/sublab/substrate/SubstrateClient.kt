@@ -22,9 +22,9 @@ import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.hashers.DefaultHashersProvider
 import dev.sublab.substrate.hashers.HashersProvider
 import dev.sublab.substrate.metadata.RuntimeMetadata
-import dev.sublab.substrate.modules.DefaultModuleRpcProvider
-import dev.sublab.substrate.modules.InternalModuleRpcProvider
-import dev.sublab.substrate.modules.ModuleRpcProvider
+import dev.sublab.substrate.modules.DefaultModuleProvider
+import dev.sublab.substrate.modules.InternalModuleProvider
+import dev.sublab.substrate.modules.ModuleProvider
 import dev.sublab.substrate.rpcClient.RpcClient
 import dev.sublab.substrate.utils.JobWithTimeout
 import dev.sublab.substrate.webSocketClient.WebSocketClient
@@ -43,7 +43,7 @@ class SubstrateClient(
     settings: SubstrateClientSettings = SubstrateClientSettings.default(),
     private val codecProvider: ScaleCodecProvider = ScaleCodecProvider.default(),
     private val hashers: HashersProvider = DefaultHashersProvider(),
-    private val moduleRpcProvider: InternalModuleRpcProvider = DefaultModuleRpcProvider(
+    private val moduleProvider: InternalModuleProvider = DefaultModuleProvider(
         codecProvider = codecProvider,
         rpcClient = RpcClient(url, settings.rpcPath, settings.rpcParams),
         hashersProvider = hashers
@@ -52,7 +52,7 @@ class SubstrateClient(
     // For testing purposes
     internal companion object
 
-    val modules: ModuleRpcProvider get() = moduleRpcProvider
+    val modules: ModuleProvider get() = moduleProvider
 
     val webSocket = WebSocketClient(
         secure = settings.webSocketSecure,
@@ -67,7 +67,7 @@ class SubstrateClient(
         runtimeMetadata.value = loadRuntime()
     }
 
-    private suspend fun loadRuntime() = modules.stateRpc().getRuntimeMetadata()
+    private suspend fun loadRuntime() = modules.state().getRuntimeMetadata()
     internal fun getRuntime(): Flow<RuntimeMetadata> {
         runtimeMetadataUpdate.perform()
         return runtimeMetadata.filterNotNull()
@@ -80,17 +80,17 @@ class SubstrateClient(
 
     init {
         // Supply dependencies
-        moduleRpcProvider.workingWithClient(this)
+        moduleProvider.workingWithClient(this)
         codecProvider.applyRuntimeMetadata(getRuntime())
 
         // Init after dependencies set
         lookup = SubstrateLookupService(getRuntime(), settings.namingPolicy)
         constants = SubstrateConstantsService(codecProvider.byteArray, lookup)
-        storage = SubstrateStorageService(codecProvider.byteArray, lookup, modules.stateRpc())
+        storage = SubstrateStorageService(codecProvider.byteArray, lookup, modules.state())
         extrinsics = SubstrateExtrinsicsService(
             runtimeMetadata = getRuntime(),
-            systemRpc = modules.systemRpc(),
-            chainRpc = modules.chainRpc(),
+            systemRpc = modules.system(),
+            chainRpc = modules.chain(),
             codec = codecProvider.byteArray,
             lookup = lookup,
             storage = storage,

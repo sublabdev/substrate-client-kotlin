@@ -70,7 +70,7 @@ class TestFetchingStorage {
 
     @Test
     internal fun testService() {
-        val service = SubstrateStorageService(ScaleCodec.default(), client.lookup, client.modules.stateRpc())
+        val service = SubstrateStorageService(ScaleCodec.default(), client.lookup, client.modules.state())
         for (item in items) {
             testStorageItem(service, item)
         }

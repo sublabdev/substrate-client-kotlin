@@ -20,7 +20,6 @@ package dev.sublab.substrate
 
 import dev.sublab.common.numerics.UInt32
 import dev.sublab.encrypting.keys.KeyPair
-import dev.sublab.encrypting.mnemonic.DefaultMnemonic
 import dev.sublab.hex.hex
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.sr25519.sr25519
@@ -31,7 +30,6 @@ import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.KusamaNetwork
 import dev.sublab.substrate.support.extrinsics.AddMemo
 import extra.kotlin.util.UUID
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.math.BigInteger
 import kotlin.reflect.KClass
@@ -118,7 +116,7 @@ internal class TestExtrinsics {
 
         println("network: ${network}, signed: ${signed.toByteArray().hex.encode(true)}")
 
-        val queryFeeDetails = client.modules.paymentRpc().getQueryFeeDetails(signed)
+        val queryFeeDetails = client.modules.payment().getQueryFeeDetails(signed)
         assertNotNull(queryFeeDetails)
         assert(queryFeeDetails.baseFee.value > BigInteger.ZERO)
     }

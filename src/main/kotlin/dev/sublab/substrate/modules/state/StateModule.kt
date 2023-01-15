@@ -31,7 +31,7 @@ import kotlin.reflect.KClass
 /**
  * Interface for getting Runtime metadata and fetching Storage Items
  */
-interface StateRpc {
+interface StateModule {
     /**
      * Gets runtime metadata
      */
@@ -81,11 +81,11 @@ interface StateRpc {
 /**
  * State RPC client which handles fetching storage item and runtime metadata
  */
-class StateRpcClient(
+class StateModuleClient(
     private val codec: HexScaleCodec,
     private val rpcClient: RpcClient,
     private val hashersProvider: HashersProvider
-): StateRpc {
+): StateModule {
     override suspend fun getRuntimeMetadata() = rpcClient.sendRequest<Unit, String> {
         method = "state_getMetadata"
         responseType = String::class

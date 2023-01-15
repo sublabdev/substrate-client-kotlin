@@ -19,36 +19,36 @@
 package dev.sublab.substrate.modules
 
 import dev.sublab.substrate.SubstrateClient
-import dev.sublab.substrate.modules.chain.ChainRpc
-import dev.sublab.substrate.modules.payment.PaymentRpc
-import dev.sublab.substrate.modules.state.StateRpc
-import dev.sublab.substrate.modules.system.SystemRpc
+import dev.sublab.substrate.modules.chain.ChainModule
+import dev.sublab.substrate.modules.payment.PaymentModule
+import dev.sublab.substrate.modules.state.StateModule
+import dev.sublab.substrate.modules.system.SystemModule
 
-interface InternalModuleRpcProvider: ModuleRpcProvider {
+interface InternalModuleProvider: ModuleProvider {
     fun workingWithClient(client: SubstrateClient)
 }
 
 /**
  * An interface for getting RPCs
  */
-interface ModuleRpcProvider {
+interface ModuleProvider {
     /**
      * Provides an interface for getting chain `RPC` client
      */
-    fun chainRpc(): ChainRpc
+    fun chain(): ChainModule
 
     /**
     * Provides an interface for getting payment `RPC` client
     */
-    fun paymentRpc(): PaymentRpc
+    fun payment(): PaymentModule
 
     /**
      * Provides an interface for getting `RuntimeMetadata` and fetching `StorageItems`
      */
-    fun stateRpc(): StateRpc
+    fun state(): StateModule
 
     /**
      * Provides an interface for getting `RuntimeVersion`
      */
-    fun systemRpc(): SystemRpc
+    fun system(): SystemModule
 }

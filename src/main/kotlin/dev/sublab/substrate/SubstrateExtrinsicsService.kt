@@ -29,13 +29,12 @@ import dev.sublab.substrate.metadata.lookup.RuntimeType
 import dev.sublab.substrate.metadata.lookup.type.RuntimeTypeDef
 import dev.sublab.substrate.metadata.lookup.type.def.RuntimeTypeDefVariant
 import dev.sublab.substrate.metadata.modules.RuntimeModule
-import dev.sublab.substrate.modules.chain.ChainRpc
-import dev.sublab.substrate.modules.system.SystemRpc
+import dev.sublab.substrate.modules.chain.ChainModule
+import dev.sublab.substrate.modules.system.SystemModule
 import dev.sublab.substrate.scale.Balance
 import dev.sublab.substrate.scale.Index
 import dev.sublab.sugar.or
 import kotlinx.coroutines.flow.*
-import java.math.BigInteger
 import kotlin.reflect.KClass
 
 private data class RuntimeCall(val module: RuntimeModule, val variant: RuntimeTypeDefVariant.Variant)
@@ -45,8 +44,8 @@ private data class RuntimeCall(val module: RuntimeModule, val variant: RuntimeTy
  */
 class SubstrateExtrinsicsService(
     private val runtimeMetadata: Flow<RuntimeMetadata>,
-    private val systemRpc: SystemRpc,
-    private val chainRpc: ChainRpc,
+    private val systemRpc: SystemModule,
+    private val chainRpc: ChainModule,
     private val codec: ScaleCodec<ByteArray>,
     private val lookup: SubstrateLookupService,
     private val storage: SubstrateStorageService,

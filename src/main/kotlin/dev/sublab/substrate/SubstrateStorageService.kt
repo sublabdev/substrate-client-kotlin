@@ -22,7 +22,7 @@ import dev.sublab.common.ByteArrayConvertible
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.substrate.metadata.modules.storage.RuntimeModuleStorage
 import dev.sublab.substrate.metadata.modules.storage.item.RuntimeModuleStorageItem
-import dev.sublab.substrate.modules.state.StateRpc
+import dev.sublab.substrate.modules.state.StateModule
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KClass
 
@@ -32,7 +32,7 @@ import kotlin.reflect.KClass
 class SubstrateStorageService(
     private val codec: ScaleCodec<ByteArray>,
     private val lookup: SubstrateLookupService,
-    private val stateRpc: StateRpc
+    private val stateRpc: StateModule
 ) {
 
     /**

@@ -25,7 +25,7 @@ import dev.sublab.substrate.rpcClient.RpcClient
 /**
  * An interface for chain RPC client
  */
-interface ChainRpc {
+interface ChainModule {
     /**
      * Gets block hash using the provided number as a parameter for `RPC` request
      */
@@ -35,9 +35,9 @@ interface ChainRpc {
 /**
  * Handles chain block hash fetching
  */
-class ChainRpcClient(
+class ChainModuleClient(
     private val rpcClient: RpcClient
-    ): ChainRpc {
+    ): ChainModule {
     override suspend fun getBlockHash(number: Int) = rpcClient.sendRequest<String, String> {
         method = "chain_getBlockHash"
         responseType = String::class
