@@ -56,7 +56,7 @@ implementation 'dev.sublab:substrate-client-kotlin:1.0.0'
 
 ## Documentation
 
-- Our GitBook: [https://docs.sublab.dev/kotlin-libraries/substrate-client-library](https://docs.sublab.dev/kotlin-libraries/substrate-client-library)
+- Our GitBook: [https://docs.sublab.dev/kotlin-libraries/substrate-client-library/](https://docs.sublab.dev/kotlin-libraries/substrate-client-library/)
 - API reference: [https://api-reference.sublab.dev/substrate-client-kotlin/](https://api-reference.sublab.dev/substrate-client-kotlin/)
 
 ## Contributing
