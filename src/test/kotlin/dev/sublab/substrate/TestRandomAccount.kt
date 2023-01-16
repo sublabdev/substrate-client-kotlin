@@ -18,7 +18,6 @@
 
 package dev.sublab.substrate
 
-import dev.sublab.common.ByteArrayConvertible
 import dev.sublab.common.asByteArrayConvertible
 import dev.sublab.ecdsa.Kind
 import dev.sublab.ecdsa.ecdsa
@@ -27,14 +26,10 @@ import dev.sublab.encrypting.keys.KeyPair
 import dev.sublab.sr25519.sr25519
 import dev.sublab.ss58.ss58
 import dev.sublab.substrate.modules.system.storage.Account
-import dev.sublab.substrate.scale.Balance
 import dev.sublab.substrate.support.KusamaNetwork
-import dev.sublab.substrate.support.extrinsics.AddMemo
-import dev.sublab.substrate.support.extrinsics.AddMemoCall
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
-import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 internal class TestRandomAccount {

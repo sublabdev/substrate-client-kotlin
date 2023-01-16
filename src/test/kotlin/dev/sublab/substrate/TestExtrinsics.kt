@@ -24,11 +24,11 @@ import dev.sublab.hex.hex
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.sr25519.sr25519
 import dev.sublab.ss58.ss58
+import dev.sublab.substrate.modules.crowdloan.calls.AddMemo
 import dev.sublab.substrate.scale.Balance
 import dev.sublab.substrate.scale.Index
 import dev.sublab.substrate.support.Constants
 import dev.sublab.substrate.support.KusamaNetwork
-import dev.sublab.substrate.support.extrinsics.AddMemo
 import extra.kotlin.util.UUID
 import kotlinx.coroutines.runBlocking
 import java.math.BigInteger
