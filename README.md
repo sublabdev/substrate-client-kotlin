@@ -12,7 +12,7 @@
 [![Telegram channel](https://img.shields.io/badge/chat-telegram-green.svg?logo=telegram)](https://t.me/sublabsupport)
 [![GitHub License](https://img.shields.io/badge/license-Apache%20License%202.0-blue.svg?style=flat)](http://www.apache.org/licenses/LICENSE-2.0)
 
-# Sublab's Common Kotlin library
+# Sublab's Substrate Client Kotlin library
 
 This is a main Kotlin repository of our organization which uses all of other repositories and combines them to provide tools to connect to Substrate based blockchain networks.
 
