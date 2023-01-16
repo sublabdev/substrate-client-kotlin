@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     `maven-publish`
+    id("org.jetbrains.dokka")
 }
 
 group = "dev.sublab"
@@ -15,6 +16,7 @@ repositories {
     maven { url = uri("https://repo.repsy.io/mvn/chrynan/public") } // Kotlin SecureRandom
 }
 
+val dokkaVersion: String by project
 val kotlinVersion: String by project
 val kotlinxSerializationJsonVersion: String by project
 val kotlinxCoroutinesVersion: String by project
@@ -29,6 +31,7 @@ val sublabEncryptingVersion: String by project
 
 dependencies {
     testImplementation(kotlin("test"))
+    dokkaHtmlPlugin("org.jetbrains.dokka:kotlin-as-java-plugin:$dokkaVersion")
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
@@ -60,6 +63,10 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.dokkaHtml.configure {
+    outputDirectory.set(projectDir.resolve("reference"))
 }
 
 tasks.withType<KotlinCompile> {
