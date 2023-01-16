@@ -14,9 +14,9 @@
 
 # Sublab's Common Kotlin library
 
-We, at Sublab, would love to have more mobile developers coming into Substrate ecosystem development. And while we're trying to produce as much as possible reliable and stable codebase, we still cannot cover all potential issues Substrate developers would need to solve, and we might have some bugs 🐞
+This is a main Kotlin repository of our organization which uses all of other repositories and combines them to provide tools to connect to Substrate based blockchain networks.
 
-So we encourage you to help us on this long journey by opening yet unknown issues or by contributing with your ideas in pull requests.
+Currently, only primary (relaychain) networks are fully tested, but this repository is subject to change when we add more networks support, including parachains and separate independent networks.
 
 ## Sublab
 
