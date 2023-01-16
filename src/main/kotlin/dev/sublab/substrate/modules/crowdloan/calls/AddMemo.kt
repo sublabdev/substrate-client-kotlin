@@ -16,7 +16,7 @@
  * 
  */
 
-package dev.sublab.substrate.support.extrinsics
+package dev.sublab.substrate.modules.crowdloan.calls
 
 import dev.sublab.common.numerics.UInt32
 import dev.sublab.substrate.extrinsics.Call
