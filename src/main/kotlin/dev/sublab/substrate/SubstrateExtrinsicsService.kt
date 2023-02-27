@@ -43,13 +43,13 @@ interface SubstrateExtrinsics {
     suspend fun <T: Any> makeUnsigned(call: Call<T>): Payload
     suspend fun <T: Any> makeSigned(
         call: Call<T>,
-        tip: Balance,
+        tip: Balance = Balance(0),
         accountId: AccountId,
-        signatureEngine: SignatureEngine
+        signatureEngine: SignatureEngine // TODO: down to signer
     ): Payload?
     suspend fun <T: Any> makeSigned(
         call: Call<T>,
-        tip: Balance,
+        tip: Balance = Balance(0),
         keyPair: KeyPair
     ): Payload?
 }
@@ -63,7 +63,8 @@ internal class SubstrateExtrinsicsService(
     private val chainRpc: ChainModule,
     private val codec: ScaleCodec<ByteArray>,
     private val lookup: SubstrateLookup,
-    private val namingPolicy: SubstrateClientNamingPolicy
+    private val namingPolicy: SubstrateClientNamingPolicy,
+    private val policy: SubstrateClientExtrinsicsPolicy
 ): SubstrateExtrinsics {
 
     private fun findCall(variant: RuntimeTypeDefVariant, callName: String) = variant.variants.firstOrNull {
@@ -129,10 +130,13 @@ internal class SubstrateExtrinsicsService(
         runtimeMetadata = runtimeMetadata.first(),
         codec = codec,
         payload = makePayload(moduleName, callName, callValue, callValueType),
-        runtimeVersion = systemRpc.runtimeVersion() ?: throw RuntimeVersionNotKnownException(),
+        runtimeVersion = systemRpc.getRuntimeVersion() ?: throw RuntimeVersionNotKnownException(),
         genesisHash = chainRpc.getBlockHash(0) ?: throw GenesisHashNotKnownException(),
         accountId = accountId,
-        nonce = systemRpc.accountByAccountId(accountId)?.nonce ?: throw NonceNotKnownException(),
+        nonce = systemRpc.getAccountByAccountId(accountId)?.nonce ?: when (policy.nonceResolving) {
+            SubstrateClientExtrinsicsPolicy.NonceResolvePolicy.SET_TO_ZERO -> Index(0)
+            SubstrateClientExtrinsicsPolicy.NonceResolvePolicy.THROW_ERROR_IF_UNKNOWN -> throw NonceNotKnownException()
+        },
         tip = tip,
         signatureEngine = signatureEngine
     )
@@ -151,7 +155,7 @@ internal class SubstrateExtrinsicsService(
         runtimeMetadata = runtimeMetadata.first(),
         codec = codec,
         payload = makePayload(moduleName, callName, callValue, callValueType),
-        runtimeVersion = systemRpc.runtimeVersion() ?: throw RuntimeVersionNotKnownException(),
+        runtimeVersion = systemRpc.getRuntimeVersion() ?: throw RuntimeVersionNotKnownException(),
         genesisHash = chainRpc.getBlockHash(0) ?: throw GenesisHashNotKnownException(),
         accountId = accountId,
         nonce = nonce,

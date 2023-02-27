@@ -18,7 +18,6 @@
 
 package dev.sublab.substrate.modules
 
-import com.sun.net.httpserver.Filter.Chain
 import dev.sublab.substrate.ScaleCodecProvider
 import dev.sublab.substrate.SubstrateClient
 import dev.sublab.substrate.hashers.HashersProvider
@@ -45,7 +44,7 @@ class DefaultModuleProvider(
     override val chain: ChainModule get() = ChainModuleClient(rpc)
     override val state: StateModule get() = StateModuleClient(codecProvider.hex, rpc, hashersProvider)
     override val system: SystemModule get() = SystemModuleClient(client.constants, client.storage)
-    override val payment: PaymentModule get() = PaymentModuleClient(codecProvider.hex, rpc)
+    override val payment: PaymentModule get() = PaymentModuleClient(rpc)
 
     // Supply dependencies
     /**

@@ -20,6 +20,8 @@ package dev.sublab.substrate.support
 
 import dev.sublab.common.numerics.UInt32
 import dev.sublab.substrate.SubstrateClient
+import dev.sublab.substrate.SubstrateClientExtrinsicsPolicy
+import dev.sublab.substrate.SubstrateClientLookupPolicy
 import dev.sublab.substrate.SubstrateClientSettings
 import dev.sublab.substrate.rpcClient.RpcClient
 
@@ -86,6 +88,8 @@ private fun makeSettings() = SubstrateClientSettings.default().let { default ->
         webSocketPort = null,
         runtimeMetadataUpdateTimeoutMs = default.runtimeMetadataUpdateTimeoutMs,
         namingPolicy = default.namingPolicy,
+        lookupPolicy = SubstrateClientLookupPolicy.unsafe(),
+        extrinsicsPolicy = SubstrateClientExtrinsicsPolicy.unsafe(),
         objectStorageFactory = default.objectStorageFactory
     )
 }

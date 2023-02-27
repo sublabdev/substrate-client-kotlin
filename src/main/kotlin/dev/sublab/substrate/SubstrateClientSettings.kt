@@ -33,6 +33,8 @@ data class SubstrateClientSettings(
     val webSocketPort: Int?,
     val runtimeMetadataUpdateTimeoutMs: Long,
     val namingPolicy: SubstrateClientNamingPolicy,
+    val lookupPolicy: SubstrateClientLookupPolicy,
+    val extrinsicsPolicy: SubstrateClientExtrinsicsPolicy,
     val objectStorageFactory: ObjectStorageFactory
 ) {
     companion object {
@@ -48,6 +50,8 @@ data class SubstrateClientSettings(
             webSocketPort = null,
             runtimeMetadataUpdateTimeoutMs = 3600 * 1000,
             namingPolicy = SubstrateClientNamingPolicy.CASE_INSENSITIVE,
+            lookupPolicy = SubstrateClientLookupPolicy.safe(),
+            extrinsicsPolicy = SubstrateClientExtrinsicsPolicy.safe(),
             objectStorageFactory = InMemoryObjectStorageFactory()
         )
     }

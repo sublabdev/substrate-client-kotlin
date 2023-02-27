@@ -35,9 +35,7 @@ interface ChainModule {
 /**
  * Handles chain block hash fetching
  */
-class ChainModuleClient(
-    private val rpc: Rpc
-    ): ChainModule {
+class ChainModuleClient(private val rpc: Rpc): ChainModule {
     override suspend fun getBlockHash(number: Int) = rpc.sendRequest<String, String> {
         method = "chain_getBlockHash"
         responseType = String::class

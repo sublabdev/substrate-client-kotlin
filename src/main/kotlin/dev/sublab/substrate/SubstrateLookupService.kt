@@ -42,15 +42,35 @@ interface SubstrateLookup {
     fun findRuntimeType(index: BigInteger): Flow<RuntimeType?>
 }
 
+private class SubstrateLookupServiceCache(
+    private val policy: SubstrateClientLookupPolicy.CachePolicy
+) {
+    val modules: MutableMap<String, RuntimeModule> = mutableMapOf()
+    val constants: MutableMap<ModulePath, RuntimeModuleConstant> = mutableMapOf()
+    val storageItems: MutableMap<ModulePath, RuntimeModuleStorageItem> = mutableMapOf()
+
+    fun handleRuntimeUpdate() {
+        if (policy != SubstrateClientLookupPolicy.CachePolicy.RESET_ON_METADATA_UPDATE) return
+
+        modules.clear()
+        constants.clear()
+        storageItems.clear()
+    }
+}
+
 /**
  * Substrate lookup service
  */
 internal class SubstrateLookupService(
     private val runtimeMetadata: Flow<RuntimeMetadata>,
-    private val namingPolicy: SubstrateClientNamingPolicy
+    private val namingPolicy: SubstrateClientNamingPolicy,
+    policy: SubstrateClientLookupPolicy
 ): SubstrateLookup {
+    private val cache = SubstrateLookupServiceCache(policy.cachePolicy)
+
     private fun lookupAsFlow() = runtimeMetadata.map {
-        SubstrateLookupServiceImplementation(it, namingPolicy)
+        cache.handleRuntimeUpdate()
+        SubstrateLookupServiceImplementation(it, namingPolicy, cache)
     }
 
     /**
@@ -89,29 +109,26 @@ data class FindStorageItemResult(val item: RuntimeModuleStorageItem, val storage
 
 private class SubstrateLookupServiceImplementation(
     private val runtimeMetadata: RuntimeMetadata,
-    private val namingPolicy: SubstrateClientNamingPolicy
+    private val namingPolicy: SubstrateClientNamingPolicy,
+    private val cache: SubstrateLookupServiceCache
 ) {
 
-    private val modulesCache: MutableMap<String, RuntimeModule> = mutableMapOf()
-    private val constantsCache: MutableMap<ModulePath, RuntimeModuleConstant> = mutableMapOf()
-    private val storageItemsCache: MutableMap<ModulePath, RuntimeModuleStorageItem> = mutableMapOf()
-
     fun findModule(name: String): RuntimeModule? {
-        val module = modulesCache[name]
+        val module = cache.modules[name]
             ?: runtimeMetadata.modules.firstOrNull { namingPolicy.equals(it.name, name) }
             ?: return null
 
-        modulesCache[name] = module
+        cache.modules[name] = module
         return module
     }
 
     private fun findConstant(module: RuntimeModule, name: String): RuntimeModuleConstant? {
         val constantPath = ModulePath(module.name, name)
-        val constant = constantsCache[constantPath]
+        val constant = cache.constants[constantPath]
             ?: module.constants.firstOrNull { namingPolicy.equals(it.name, name) }
             ?: return null
 
-        constantsCache[constantPath] = constant
+        cache.constants[constantPath] = constant
         return constant
     }
 
@@ -123,11 +140,11 @@ private class SubstrateLookupServiceImplementation(
         val storage = module.storage ?: return null
 
         val constantPath = ModulePath(module.name, name)
-        val item = storageItemsCache[constantPath]
+        val item = cache.storageItems[constantPath]
             ?: module.storage.items.firstOrNull { namingPolicy.equals(it.name, name) }
             ?: return null
 
-        storageItemsCache[constantPath] = item
+        cache.storageItems[constantPath] = item
 
         return FindStorageItemResult(item, storage)
     }

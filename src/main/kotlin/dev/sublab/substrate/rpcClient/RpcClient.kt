@@ -51,13 +51,13 @@ interface Rpc {
 /**
  * RPC client that handles sending requests
  */
-internal class RpcClient(
+class RpcClient(
     private val host: String,
     private val path: String? = null,
     private val params: Map<String, Any?> = mapOf()
 ): Rpc {
     // For testing purposes
-    internal companion object
+    internal companion object;
 
     private val httpClient = HttpClient(CIO) {
         install(ContentNegotiation) {

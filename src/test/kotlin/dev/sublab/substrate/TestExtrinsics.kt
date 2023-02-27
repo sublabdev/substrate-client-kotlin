@@ -122,8 +122,8 @@ internal class TestExtrinsics {
 
         println("network: ${network}, signed: ${signed.toByteArray().hex.encode(true)}")
 
-        val queryFeeDetails = client.modules.payment.getQueryFeeDetails(signed)
-        assertNotNull(queryFeeDetails)
-        assert(queryFeeDetails.baseFee.value > BigInteger.ZERO)
+        val fee = client.modules.payment.getQueryFeeDetails(signed)
+        assertNotNull(fee)
+        assert(fee.baseFee.value > BigInteger.ZERO)
     }
 }
