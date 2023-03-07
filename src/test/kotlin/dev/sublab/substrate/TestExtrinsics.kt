@@ -117,7 +117,7 @@ internal class TestExtrinsics {
             tip = Balance(BigInteger("0")),
             accountId = keyPair.publicKey.ss58.accountId(),
             nonce = Index(BigInteger("0")),
-            signatureEngine = keyPair.getSignatureEngine(keyPair.privateKey)
+            signer = keyPair.getSignatureEngine(keyPair.privateKey)
         )
 
         println("network: ${network}, signed: ${signed.toByteArray().hex.encode(true)}")

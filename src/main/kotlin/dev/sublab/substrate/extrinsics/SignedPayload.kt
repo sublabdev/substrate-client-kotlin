@@ -19,7 +19,7 @@
 package dev.sublab.substrate.extrinsics
 
 import dev.sublab.common.numerics.UInt8
-import dev.sublab.encrypting.signing.SignatureEngine
+import dev.sublab.encrypting.signing.NamedSigner
 import dev.sublab.hashing.hashers.blake2b_256
 import dev.sublab.hashing.hashing
 import dev.sublab.hex.hex
@@ -49,7 +49,7 @@ internal class SignedPayload<T: Any>(
     internal val accountId: AccountId,
     internal val nonce: Index,
     internal val tip: Balance,
-    internal val signatureEngine: SignatureEngine
+    internal val signer: NamedSigner
 ): Payload {
     override val moduleName: String get() = payload.moduleName
     override val callName: String get() = payload.callName
@@ -69,8 +69,8 @@ internal class SignedPayload<T: Any>(
 //            if (size > 256) signatureEngine.sign(hashing.blake2b_256())
 //            else signatureEngine.sign(this)
 //                .hex.encode(true)}")
-        if (size > 256) signatureEngine.sign(hashing.blake2b_256())
-        else signatureEngine.sign(this)
+        if (size > 256) signer.sign(hashing.blake2b_256())
+        else signer.sign(this)
     }
 
 //    private fun makeExtrinsic() = Extrinsic(
@@ -139,7 +139,7 @@ private fun <T: Any, Data: Any> ScaleCodecTransaction<Data>.appendSignature(sign
         ?: throw ExtrinsicBuildFailedDueToLookupFailureException()
 
     val signatureTypeIndex = signatureVariants.firstOrNull {
-        it.name.lowercase() == signedPayload.signatureEngine.name.lowercase()
+        it.name.lowercase() == signedPayload.signer.name.lowercase()
     }?.indexUInt8 ?: throw ExtrinsicBuildFailedDueToLookupFailureException()
 
 //    println("[signature] index: $signatureTypeIndex]")

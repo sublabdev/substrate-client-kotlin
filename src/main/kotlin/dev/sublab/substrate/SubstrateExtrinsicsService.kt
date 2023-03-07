@@ -19,6 +19,7 @@
 package dev.sublab.substrate
 
 import dev.sublab.encrypting.keys.KeyPair
+import dev.sublab.encrypting.signing.NamedSigner
 import dev.sublab.encrypting.signing.SignatureEngine
 import dev.sublab.scale.ScaleCodec
 import dev.sublab.ss58.AccountId
@@ -41,12 +42,21 @@ private data class RuntimeCall(val module: RuntimeModule, val variant: RuntimeTy
 
 interface SubstrateExtrinsics {
     suspend fun <T: Any> makeUnsigned(call: Call<T>): Payload
+
     suspend fun <T: Any> makeSigned(
         call: Call<T>,
         tip: Balance = Balance(0),
         accountId: AccountId,
-        signatureEngine: SignatureEngine // TODO: down to signer
+        signer: NamedSigner
     ): Payload?
+
+    suspend fun <T: Any> makeSigned(
+        call: Call<T>,
+        tip: Balance = Balance(0),
+        accountId: AccountId,
+        signatureEngine: SignatureEngine
+    ): Payload?
+
     suspend fun <T: Any> makeSigned(
         call: Call<T>,
         tip: Balance = Balance(0),
@@ -125,7 +135,7 @@ internal class SubstrateExtrinsicsService(
         callValueType: KClass<T>,
         tip: Balance,
         accountId: AccountId,
-        signatureEngine: SignatureEngine
+        signer: NamedSigner
     ): Payload = SignedPayload(
         runtimeMetadata = runtimeMetadata.first(),
         codec = codec,
@@ -138,7 +148,7 @@ internal class SubstrateExtrinsicsService(
             SubstrateClientExtrinsicsPolicy.NonceResolvePolicy.THROW_ERROR_IF_UNKNOWN -> throw NonceNotKnownException()
         },
         tip = tip,
-        signatureEngine = signatureEngine
+        signer = signer
     )
 
     // Tests for empty account
@@ -150,7 +160,7 @@ internal class SubstrateExtrinsicsService(
         tip: Balance,
         accountId: AccountId,
         nonce: Index,
-        signatureEngine: SignatureEngine
+        signer: NamedSigner
     ): Payload = SignedPayload(
         runtimeMetadata = runtimeMetadata.first(),
         codec = codec,
@@ -160,7 +170,22 @@ internal class SubstrateExtrinsicsService(
         accountId = accountId,
         nonce = nonce,
         tip = tip,
-        signatureEngine = signatureEngine
+        signer = signer
+    )
+
+    override suspend fun <T: Any> makeSigned(
+        call: Call<T>,
+        tip: Balance,
+        accountId: AccountId,
+        signer: NamedSigner
+    ) = makeSigned(
+        moduleName = call.moduleName,
+        callName = call.name,
+        callValue = call.value,
+        callValueType = call.type,
+        tip = tip,
+        accountId = accountId,
+        signer = signer
     )
 
     override suspend fun <T: Any> makeSigned(
@@ -169,13 +194,10 @@ internal class SubstrateExtrinsicsService(
         accountId: AccountId,
         signatureEngine: SignatureEngine
     ) = makeSigned(
-        moduleName = call.moduleName,
-        callName = call.name,
-        callValue = call.value,
-        callValueType = call.type,
+        call = call,
         tip = tip,
         accountId = accountId,
-        signatureEngine = signatureEngine
+        signer = signatureEngine
     )
 
     override suspend fun <T: Any> makeSigned(
