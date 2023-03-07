@@ -83,7 +83,7 @@ internal class TestRuntimeMetadata {
     fun testRuntimeVersion() = runBlocking {
         for (network in allNetworks()) {
             val client = network.makeClient()
-            val runtimeVersion = client.modules.system.runtimeVersion()
+            val runtimeVersion = client.modules.system.getRuntimeVersion()
             assertNotNull(runtimeVersion)
         }
     }

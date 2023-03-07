@@ -85,7 +85,7 @@ class SubstrateClient(
         codecProvider.applyRuntimeMetadata(getRuntime())
 
         // Init after dependencies set
-        lookup = SubstrateLookupService(getRuntime(), settings.namingPolicy)
+        lookup = SubstrateLookupService(getRuntime(), settings.namingPolicy, settings.lookupPolicy)
         constants = SubstrateConstantsService(codecProvider.byteArray, lookup)
         storage = SubstrateStorageService(codecProvider.byteArray, lookup, modules.state)
         extrinsics = SubstrateExtrinsicsService(
@@ -94,7 +94,8 @@ class SubstrateClient(
             chainRpc = modules.chain,
             codec = codecProvider.byteArray,
             lookup = lookup,
-            namingPolicy = settings.namingPolicy
+            namingPolicy = settings.namingPolicy,
+            policy = settings.extrinsicsPolicy
         )
     }
 }

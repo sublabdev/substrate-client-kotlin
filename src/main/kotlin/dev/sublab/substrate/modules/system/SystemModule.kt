@@ -31,37 +31,37 @@ import dev.sublab.substrate.modules.system.storage.Account
 import kotlinx.coroutines.flow.first
 
 interface SystemModule {
-    suspend fun runtimeVersion(): RuntimeVersion?
-    suspend fun accountByAccountId(accountId: ByteArrayConvertible): Account?
-    suspend fun accountByAccountId(accountId: AccountId): Account?
-    suspend fun accountByAccountId(accountIdHex: String): Account?
-    suspend fun accountByPublicKey(publicKey: ByteArray): Account?
-    suspend fun accountByPublicKey(publicKeyHex: String): Account?
-    suspend fun accountByKeyPair(keyPair: KeyPair): Account?
+    suspend fun getRuntimeVersion(): RuntimeVersion?
+    suspend fun getAccountByAccountId(accountId: ByteArrayConvertible): Account?
+    suspend fun getAccountByAccountId(accountId: AccountId): Account?
+    suspend fun getAccountByAccountId(accountIdHex: String): Account?
+    suspend fun getAccountByPublicKey(publicKey: ByteArray): Account?
+    suspend fun getAccountByPublicKey(publicKeyHex: String): Account?
+    suspend fun getAccountByKeyPair(keyPair: KeyPair): Account?
 }
 
 class SystemModuleClient(
     private val constants: SubstrateConstants,
     private val storage: SubstrateStorage
 ): SystemModule {
-    override suspend fun runtimeVersion() = constants
+    override suspend fun getRuntimeVersion() = constants
         .fetch("system", "version", RuntimeVersion::class).first()
 
-    override suspend fun accountByAccountId(accountId: ByteArrayConvertible) = storage
+    override suspend fun getAccountByAccountId(accountId: ByteArrayConvertible) = storage
         .fetch("system", "account", accountId, Account::class).first()
 
-    override suspend fun accountByAccountId(accountId: AccountId)
-        = accountByAccountId(accountId.asByteArrayConvertible())
+    override suspend fun getAccountByAccountId(accountId: AccountId)
+        = getAccountByAccountId(accountId.asByteArrayConvertible())
 
-    override suspend fun accountByAccountId(accountIdHex: String)
-            = accountByAccountId(accountIdHex.hex.decode())
+    override suspend fun getAccountByAccountId(accountIdHex: String)
+            = getAccountByAccountId(accountIdHex.hex.decode())
 
-    override suspend fun accountByPublicKey(publicKey: ByteArray)
-            = accountByAccountId(publicKey.ss58.accountId())
+    override suspend fun getAccountByPublicKey(publicKey: ByteArray)
+            = getAccountByAccountId(publicKey.ss58.accountId())
 
-    override suspend fun accountByPublicKey(publicKeyHex: String)
-            = accountByPublicKey(publicKeyHex.hex.decode())
+    override suspend fun getAccountByPublicKey(publicKeyHex: String)
+            = getAccountByPublicKey(publicKeyHex.hex.decode())
 
-    override suspend fun accountByKeyPair(keyPair: KeyPair)
-            = accountByPublicKey(keyPair.publicKey)
+    override suspend fun getAccountByKeyPair(keyPair: KeyPair)
+            = getAccountByPublicKey(keyPair.publicKey)
 }

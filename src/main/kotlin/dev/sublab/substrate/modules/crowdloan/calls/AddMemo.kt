@@ -21,9 +21,10 @@ package dev.sublab.substrate.modules.crowdloan.calls
 import dev.sublab.common.numerics.UInt32
 import dev.sublab.substrate.extrinsics.Call
 
-internal data class AddMemo(val index: UInt32, val memo: ByteArray)
+@Suppress("ArrayInDataClass")
+data class AddMemo(val index: UInt32, val memo: ByteArray)
 
-internal class AddMemoCall(value: AddMemo) : Call<AddMemo>(
+class AddMemoCall(value: AddMemo) : Call<AddMemo>(
     moduleName = "crowdloan",
     name = "add_memo",
     value = value,

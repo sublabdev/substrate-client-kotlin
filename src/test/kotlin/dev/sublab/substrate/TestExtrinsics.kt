@@ -117,13 +117,13 @@ internal class TestExtrinsics {
             tip = Balance(BigInteger("0")),
             accountId = keyPair.publicKey.ss58.accountId(),
             nonce = Index(BigInteger("0")),
-            signatureEngine = keyPair.getSignatureEngine(keyPair.privateKey)
+            signer = keyPair.getSignatureEngine(keyPair.privateKey)
         )
 
         println("network: ${network}, signed: ${signed.toByteArray().hex.encode(true)}")
 
-        val queryFeeDetails = client.modules.payment.getQueryFeeDetails(signed)
-        assertNotNull(queryFeeDetails)
-        assert(queryFeeDetails.baseFee.value > BigInteger.ZERO)
+        val fee = client.modules.payment.getQueryFeeDetails(signed)
+        assertNotNull(fee)
+        assert(fee.baseFee.value > BigInteger.ZERO)
     }
 }

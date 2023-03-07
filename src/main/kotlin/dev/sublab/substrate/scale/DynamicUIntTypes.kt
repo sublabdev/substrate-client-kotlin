@@ -27,6 +27,8 @@ import java.math.BigInteger
 @DynamicType(lookupIndex = 4)
 class Index(byteArray: ByteArray): FromByteArray(byteArray) {
     constructor(value: BigInteger) : this(value.toByteArray().reversedArray())
+    constructor(value: Int) : this(BigInteger.valueOf(value.toLong()))
+    constructor(value: Long) : this(BigInteger.valueOf(value))
 
     val value = BigInteger(byteArray.reversedArray())
     // Required to convert to and from actual type
@@ -38,6 +40,8 @@ class Index(byteArray: ByteArray): FromByteArray(byteArray) {
  */
 @DynamicType(lookupIndex = 6)
 class Balance(byteArray: ByteArray): FromByteArray(byteArray) {
+    constructor(value: Int) : this(BigInteger.valueOf(value.toLong()))
+    constructor(value: Long) : this(BigInteger.valueOf(value))
     constructor(value: BigInteger) : this(value.toByteArray().reversedArray())
 
     val value = BigInteger(byteArray.reversedArray())

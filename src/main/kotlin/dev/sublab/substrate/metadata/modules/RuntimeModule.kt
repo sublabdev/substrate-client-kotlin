@@ -31,6 +31,5 @@ data class RuntimeModule(
     val errorsIndex: BigInteger?,
     val indexUInt8: UInt8
 ) {
-
     val index: UInt32 get() = indexUInt8.toUInt()
 }
